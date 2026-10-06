@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: petmatch-backend
+    runtime: docker
+    plan: free
+    region: oregon
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /
+    envVars:
+      - key: DATABASE_URL
+        value: postgresql+psycopg2://neondb_owner:npg_VTEdG6hXmPH7@ep-crimson-butterfly-atp0naml-pooler.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require
+      - key: JWT_SECRET
+        value: escribo-yoyo-una-frase-larga-random-solo-tuya-32-caracteres-oo-mas
+      - key: ALGORITHM
+        value: HS256
+      - key: ACCESS_TOKEN_EXPIRE_MINUTES
+        value: 43200
