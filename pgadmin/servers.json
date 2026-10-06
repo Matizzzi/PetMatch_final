@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "PetMatch (Neon Cloud)",
+      "Group": "PetMatch",
+      "Host": "ep-crimson-butterfly-atp0naml-pooler.c-9.us-east-1.aws.neon.tech",
+      "Port": 5432,
+      "MaintenanceDB": "neondb",
+      "Username": "neondb_owner",
+      "SSLMode": "require"
+    }
+  }
+}

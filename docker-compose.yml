@@ -1,0 +1,86 @@
+services:
+  # ==========================================
+  # BACKEND: FastAPI + Python 3.11 + Neon DB
+  # ==========================================
+  backend:
+    build:
+      context: ./petmatch_Backend-main
+      dockerfile: Dockerfile
+    container_name: petmatch_backend
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    env_file:
+      - .env
+    environment:
+      - PORT=8000
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - ALGORITHM=${ALGORITHM}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
+      - BASE_URL=${BASE_URL}
+    volumes:
+      - ./petmatch_Backend-main/uploads:/app/uploads
+      - ./petmatch_Backend-main/app:/app/app
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  # ==========================================
+  # FRONTEND: Expo React Native Web + Nginx
+  # ==========================================
+  frontend:
+    build:
+      context: ./petmatch_Front-main
+      dockerfile: Dockerfile
+      args:
+        - EXPO_PUBLIC_API_URL=${EXPO_PUBLIC_API_URL:-http://localhost:8000}
+    container_name: petmatch_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  # ==========================================
+  # PGADMIN 4: Panel Web para Base de Datos
+  # ==========================================
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: petmatch_pgadmin
+    restart: unless-stopped
+    ports:
+      - "5050:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@petmatch.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+      - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
+
+  # ==========================================
+  # BASE DE DATOS LOCAL OPCIONAL (OFFLINE)
+  # Solo se inicia si ejecutas: docker compose --profile local-db up
+  # Por defecto el proyecto usa Neon DB en la nube.
+  # ==========================================
+  postgres:
+    image: postgres:15-alpine
+    container_name: petmatch_postgres
+    profiles:
+      - local-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: petmatch_user
+      POSTGRES_PASSWORD: petmatch_password
+      POSTGRES_DB: petmatch
+    ports:
+      - "5432:5432"
+    volumes:
+      - petmatch_pgdata:/var/lib/postgresql/data
+
+volumes:
+  petmatch_pgdata:
