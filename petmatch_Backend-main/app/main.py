@@ -30,9 +30,20 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Asegurar que el directorio de subidas exista y montarlo como estático
+from fastapi.responses import FileResponse, RedirectResponse
+
+DEFAULT_PET_FALLBACK_URL = "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=800&auto=format&fit=crop"
+
+# Asegurar que el directorio de subidas exista
 os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=settings.UPLOAD_DIR), name="uploads")
+
+@app.get("/uploads/{filename:path}", tags=["Archivos"])
+async def serve_upload_file(filename: str):
+    clean_filename = os.path.basename(filename)
+    file_path = os.path.join(settings.UPLOAD_DIR, clean_filename)
+    if os.path.exists(file_path) and os.path.isfile(file_path):
+        return FileResponse(file_path)
+    return RedirectResponse(DEFAULT_PET_FALLBACK_URL, status_code=307)
 
 # Incluir routers de la API
 app.include_router(auth.router, prefix="/api/auth", tags=["Autenticación"])

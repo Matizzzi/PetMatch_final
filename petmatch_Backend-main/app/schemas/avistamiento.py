@@ -26,3 +26,16 @@ class AvistamientosListResponse(BaseModel):
 class AvistamientoCreateResponse(BaseModel):
     success: bool = True
     reporte: AvistamientoResponse
+
+
+class AvistamientoCreateForm(BaseModel):
+    """Campos multipart de POST /api/avistamientos (la foto viaja aparte como UploadFile)."""
+    especie: str
+    descripcion: str
+    latitud: float
+    longitud: float
+    comuna: Optional[str] = None
+    contactoNombre: Optional[str] = None
+    contactoTelefono: Optional[str] = None
+    contactoEmail: Optional[str] = None
+    fotoUrl: Optional[str] = None

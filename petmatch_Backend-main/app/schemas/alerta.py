@@ -40,3 +40,20 @@ class AlertasListResponse(BaseModel):
 class AlertaCreateResponse(BaseModel):
     success: bool = True
     alerta: AlertaResponse
+
+
+class AlertaCreateForm(BaseModel):
+    """Campos multipart de POST /api/alertas (la foto viaja aparte como UploadFile)."""
+    nombreMascota: str
+    especie: str
+    descripcion: str
+    latitud: float
+    longitud: float
+    sector: Optional[str] = None
+    urgente: bool = False
+    usaCollar: bool = False
+    descripcionCollar: Optional[str] = None
+    tieneChip: bool = False
+    condicionMedica: Optional[str] = None
+    whatsapp: Optional[str] = None
+    fotoUrl: Optional[str] = None

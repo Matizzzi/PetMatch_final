@@ -32,6 +32,10 @@ const API_URL = resolveApiUrl();
 
 export function resolveFotoUrl(url?: string | null): string | null {
   if (!url) return null;
+  // Si es un Data URL en Base64 (almacenado directamente en Neon DB), retornar tal cual
+  if (url.startsWith("data:image/")) {
+    return url;
+  }
   const currentApi = resolveApiUrl();
 
   // Si la URL guardada en DB tiene localhost:8000 pero estamos accediendo desde otra IP o Render

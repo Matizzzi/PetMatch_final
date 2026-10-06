@@ -19,7 +19,7 @@ import { FilterChips, FilterType } from "@/components/petmatch/filter-chips";
 import MapSection from "@/components/petmatch/map-section";
 import { PetCard } from "@/components/petmatch/card";
 import { SightingCard } from "@/components/petmatch/sighting-card";
-import { MatchesModal } from "@/components/petmatch/matches-modal";
+import { MatchesModal } from "@/components/matches/matches-modal";
 import { PosterModal } from "@/components/petmatch/poster-modal";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";

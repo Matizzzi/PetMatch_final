@@ -1,56 +1,77 @@
-# 🐾 PetMatch — Plataforma Completa (Docker, Frontend, Backend & Neon DB)
+# 🐾 PetMatch — Plataforma de Rescate y Búsqueda de Mascotas Perdidas
 
-Bienvenido a **PetMatch**, la solución integral para el reporte, rescate y encuentro de mascotas perdidas. Este repositorio unifica el **Frontend (Expo React Native Web)** y el **Backend (FastAPI + Python)** con persistencia en **Neon Serverless PostgreSQL** y soporte de despliegue en **Render** y **Docker**.
+> **Proyecto de Título de Ingeniería de Software**  
+> Plataforma comunitaria integral para reporte, rescate y encuentro de mascotas perdidas mediante geolocalización, matching heurístico multivariable e Inteligencia Artificial Multimodal (Google Gemini Vision).
 
 ---
 
-## 🚀 Inicio Rápido con Docker (Para Cualquier PC)
+## 🚀 Inicio Rápido en Cualquier PC (100% Docker)
 
-Solo necesitas tener instalado **Docker** y **Docker Compose**.
+El proyecto está diseñado para funcionar en **cualquier computadora** (Windows, macOS, Linux) teniendo instalado únicamente **Docker Desktop**. No requiere instalar Node.js, Python ni PostgreSQL en la máquina host.
 
-### 1. Clonar y configurar variables de entorno
-```bash
-# Copia el archivo de variables de entorno si no lo tienes
-cp .env.example .env
-```
+### Opción A: En Windows (Doble Clic)
+Simplemente haz doble clic en el archivo **`iniciar.bat`**.  
+Este script compilará e iniciará todos los contenedores y abrirá la aplicación web en tu navegador automáticamente. Para detenerlo, ejecuta **`detener.bat`**.
 
-El archivo `.env` ya viene preconfigurado con la base de datos **Neon PostgreSQL** en la nube:
-```env
-DATABASE_URL="postgresql+psycopg2://neondb_owner:npg_VTEdG6hXmPH7@ep-crimson-butterfly-atp0naml-pooler.c-9.us-east-1.aws.neon.tech/neondb?sslmode=require"
-JWT_SECRET="escribo-yoyo-una-frase-larga-random-solo-tuya-32-caracteres-oo-mas"
-ALGORITHM="HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES=43200
-BASE_URL="http://localhost:8000"
-PORT=8000
-EXPO_PUBLIC_API_URL=http://localhost:8000
-```
-
-### 2. Iniciar todos los servicios
-Ejecuta el siguiente comando en la raíz del proyecto:
+### Opción B: En Terminal (Windows PowerShell / macOS / Linux)
+Ejecuta en la raíz de esta carpeta:
 ```bash
 docker compose up -d --build
 ```
 
-### 3. Acceder a las aplicaciones
-- **Frontend Web**: [http://localhost:3000](http://localhost:3000)
-- **Backend API**: [http://localhost:8000](http://localhost:8000)
-- **Documentación Swagger Interactiva**: [http://localhost:8000/docs](http://localhost:8000/docs)
-- **Documentación ReDoc**: [http://localhost:8000/redoc](http://localhost:8000/redoc)
+> **Nota:** El archivo `.env` ya viene preconfigurado con la base de datos en la nube (Neon PostgreSQL). Además, el archivo `docker-compose.yml` cuenta con valores por defecto automáticos, por lo que **funcionará directamente sin necesidad de configuración manual**.
 
 ---
 
-## 📦 Arquitectura de Contenedores
+## 🌐 Enlaces de Acceso Local
 
-| Servicio | Contenedor | Puerto Host | Puerto Interno | Descripción |
-| :--- | :--- | :--- | :--- | :--- |
-| **Frontend** | `petmatch_frontend` | `3000` | `80` | Expo Web servido con Nginx optimizado y reverse proxy a la API y subidas. |
-| **Backend** | `petmatch_backend` | `8000` | `8000` | API FastAPI con recarga de código en caliente (volúmenes mapeados) y subida de archivos `/uploads`. |
-| **Base de Datos** | *Neon Cloud DB* | N/A | `5432` | PostgreSQL Serverless en la nube con reconexión automática (`pool_pre_ping`). |
-| **Postgres Local (Opcional)** | `petmatch_postgres` | `5432` | `5432` | Para uso 100% offline ejecutando `docker compose --profile local-db up`. |
+Una vez iniciado Docker, los servicios estarán disponibles en:
+
+| Servicio | URL | Credenciales / Detalles |
+| :--- | :--- | :--- |
+| **Frontend Web** | [http://localhost:3000](http://localhost:3000) | Aplicación Expo React Native Web servida por Nginx |
+| **Backend REST API** | [http://localhost:8000](http://localhost:8000) | FastAPI + Uvicorn |
+| **Documentación Swagger** | [http://localhost:8000/docs](http://localhost:8000/docs) | Interfaz OpenAPI para probar todos los endpoints |
+| **Documentación ReDoc** | [http://localhost:8000/redoc](http://localhost:8000/redoc) | Especificación técnica de la API |
+| **pgAdmin 4 (Opcional)** | [http://localhost:5050](http://localhost:5050) | Email: `admin@petmatch.com` \| Clave: `admin` |
 
 ---
 
-## 🛠️ Comandos Útiles
+## 🏗️ Arquitectura del Sistema
+
+```text
+[ Cliente Web / Móvil ]
+      │
+      ▼ (Puerto 3000)
+┌───────────────────────────────────────────────┐
+│              petmatch_frontend                │
+│    Expo React Native Web 57 + Nginx 1.25     │
+│  - SPA Routing                                │
+│  - Reverse proxy /api/ y /uploads/ hacia API  │
+└───────────────────────┬───────────────────────┘
+                        │
+                        ▼ (Puerto 8000)
+┌───────────────────────────────────────────────┐
+│               petmatch_backend                │
+│            FastAPI + Python 3.11              │
+│  - Autenticación JWT / Sesión Comunitaria     │
+│  - Heurística de Coincidencia (55% D, 25% T, 20% P)
+│  - Visión Computacional Multimodal (Gemini)   │
+│  - Subida y almacenamiento de fotos /uploads  │
+└───────────────────────┬───────────────────────┘
+                        │
+        ┌───────────────┴───────────────┐
+        ▼                               ▼
+┌────────────────────────┐    ┌────────────────────────┐
+│  Neon Cloud PostgreSQL │    │  Postgres Local Alpine │
+│  (Base por defecto)    │    │  (Modo offline local)  │
+│  Serverless + SSL      │    │  `--profile local-db`  │
+└────────────────────────┘    └────────────────────────┘
+```
+
+---
+
+## 🛠️ Comandos de Mantenimiento
 
 - **Ver el estado de los contenedores:**
   ```bash
@@ -60,18 +81,31 @@ docker compose up -d --build
   ```bash
   docker compose logs -f
   ```
-- **Detener los contenedores:**
+- **Detener los servicios:**
   ```bash
   docker compose down
   ```
-- **Reiniciar servicios:**
+- **Reiniciar todos los servicios:**
   ```bash
   docker compose restart
+  ```
+- **Modo 100% Offline (Base de datos local en Docker):**
+  ```bash
+  docker compose --profile local-db up -d
   ```
 
 ---
 
-## ☁️ Despliegue en Producción (Render & Vercel)
+## 🐾 Funcionalidades Principales
 
-- **Backend en Render**: El archivo `render.yaml` en la raíz y en `petmatch_Backend-main/render.yaml` permite despliegue automático mediante Blueprint o Docker Web Service.
-- **Frontend en Vercel / Render**: El frontend puede desplegarse en Vercel mediante `petmatch_Front-main/vercel.json` o mediante el contenedor Docker en Render.
+1. **Exploración Georreferenciada**: Mapa interactivo con marcadores diferenciados de mascotas perdidas y avistamientos de animales callejeros (foco inicial: Melipilla, Chile).
+2. **Reporte de Pérdida con IA**: Generación de alertas con carga de fotos, señas particulares y análisis morfológico automático mediante Gemini Vision.
+3. **Reportes Comunitarios de Avistamientos**: Reporte rápido por testigos con geolocalización y contacto WhatsApp directo.
+4. **Algoritmo de Matching Heurístico**:
+   - Validación estricta de especie (perro/gato).
+   - Distancia geográfica (Haversine, 55% de ponderación).
+   - Cercanía temporal (25% de ponderación).
+   - Coincidencia léxica de rasgos y pelaje (20% de ponderación).
+   - Generación automática de posibles coincidencias (`score >= 50%`).
+5. **Peritaje Biométrico Forense**: Comparación fotográfica lado a lado de mascota perdida vs. animal avistado con IA, discriminando suciedad o desgaste por calle vs. rasgos óseos y manchas invariables.
+6. **Generador de Afiches de Búsqueda**: Creación instantánea de afiche con datos y foto para compartir en redes sociales y WhatsApp.

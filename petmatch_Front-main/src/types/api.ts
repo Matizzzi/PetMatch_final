@@ -1,3 +1,10 @@
+/**
+ * Entidades de dominio y respuestas de la API REST de PetMatch.
+ * Reflejan los schemas Pydantic de `petmatch_Backend-main/app/schemas`.
+ */
+
+export type Especie = "perro" | "gato" | "otro";
+
 export interface Usuario {
   id: string;
   nombre: string;
@@ -62,12 +69,23 @@ export interface Match {
   avistamiento?: ReporteAvistamiento;
 }
 
+// ---------- Respuestas ----------
+
 export interface MatchesResponse {
   total: number;
   matches: Match[];
 }
 
+export interface AlertaCreateResponse {
+  success: boolean;
+  alerta: AlertaPerdida;
+}
+
+export interface AvistamientoCreateResponse {
+  success: boolean;
+  reporte: ReporteAvistamiento;
+}
+
 export interface ApiError {
   error: string;
 }
-
