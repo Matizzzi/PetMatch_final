@@ -14,5 +14,6 @@ export async function crearAvistamiento(
     method: "POST",
     body: fd,
     auth: conSesion,
+    timeoutMs: 60_000,
   });
 }

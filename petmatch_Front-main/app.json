@@ -45,6 +45,13 @@
       "expo-status-bar",
       "expo-secure-store",
       "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "PetMatch necesita acceder a tus fotos para adjuntar la imagen de la mascota.",
+          "cameraPermission": "PetMatch usa la cámara para fotografiar a la mascota perdida o avistada."
+        }
+      ],
       "expo-sharing",
       [
         "expo-media-library",

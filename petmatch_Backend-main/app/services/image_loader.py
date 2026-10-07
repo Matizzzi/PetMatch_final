@@ -42,8 +42,10 @@ async def leer_imagen_de_request(
     Resuelve la imagen enviada al endpoint de análisis.
     Lanza ImagenInvalidaError con un mensaje apto para responder 400.
     """
-    if foto and foto.filename:
-        return await foto.read(), foto.content_type or "image/jpeg"
+    if foto is not None:
+        contents = await foto.read()
+        if contents:
+            return contents, foto.content_type or "image/jpeg"
 
     if not foto_url:
         raise ImagenInvalidaError(

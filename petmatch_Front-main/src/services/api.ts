@@ -62,23 +62,76 @@ export class ApiRequestError extends Error {
 }
 
 interface RequestOptions {
-  method?: "GET" | "POST" | "PUT" | "DELETE";
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: FormData | Record<string, unknown>;
   auth?: boolean; // si true, adjunta el token de sesión
+  /** Tiempo máximo por intento. Render (plan gratuito) puede tardar ~50 s en despertar. */
+  timeoutMs?: number;
+}
+
+const DEFAULT_TIMEOUT_MS = 45_000;
+export const STATUS_SIN_CONEXION = 0;
+export const STATUS_TIMEOUT = 408;
+
+const MENSAJE_SIN_CONEXION = "No se pudo conectar con el servidor. Revisa tu conexión a internet.";
+const MENSAJE_TIMEOUT =
+  "El servidor tardó demasiado en responder (puede estar iniciándose). Intenta de nuevo en unos segundos.";
+const MENSAJE_OKHTTP =
+  "No se pudo enviar la foto. Vuelve a tomarla o elígela de la galería e inténtalo de nuevo.";
+
+class TimeoutError extends Error {}
+
+function esFormData(body: unknown): body is FormData {
+  return !!body && typeof (body as FormData).append === "function";
+}
+
+async function fetchConTimeout(url: string, init: RequestInit, timeoutMs: number): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } catch (err) {
+    if (controller.signal.aborted) throw new TimeoutError();
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** Extrae el mensaje real del backend: `detail` de FastAPI (string o lista de validación) o `error`. */
+function mensajeDelBackend(data: unknown, status: number): string {
+  if (data && typeof data === "object") {
+    const { detail, error, mensaje, message } = data as Record<string, unknown>;
+    if (typeof detail === "string" && detail) return detail;
+    if (Array.isArray(detail) && detail.length) {
+      return detail
+        .map((d) => (d && typeof d === "object" && "msg" in d ? String((d as { msg: unknown }).msg) : String(d)))
+        .join(". ");
+    }
+    if (typeof error === "string" && error) return error;
+    if (typeof mensaje === "string" && mensaje) return mensaje;
+    if (typeof message === "string" && message) return message;
+  }
+  if (typeof data === "string" && data.trim() && !data.trimStart().startsWith("<")) return data.trim();
+  if (status === 413) return "La imagen es demasiado grande. Intenta con otra foto.";
+  if (status >= 500) return `El servidor tuvo un problema (HTTP ${status}). Intenta de nuevo en unos segundos.`;
+  return `Ocurrió un error inesperado (HTTP ${status}).`;
 }
 
 export async function apiRequest<T>(
   path: string,
   options: RequestOptions = {},
 ): Promise<T> {
-  const { method = "GET", body, auth = false } = options;
+  const { method = "GET", body, auth = false, timeoutMs = DEFAULT_TIMEOUT_MS } = options;
 
   const headers: Record<string, string> = {
     "ngrok-skip-browser-warning": "true",
   };
   let requestBody: BodyInit | undefined;
 
-  if (body instanceof FormData) {
+  // En Hermes/Android `instanceof FormData` a veces falla y JSON.stringify(FormData)
+  // manda "{}": FastAPI no ve foto ni fotoUrl y responde 400.
+  if (esFormData(body)) {
     requestBody = body;
     // No seteamos Content-Type: fetch lo arma solo con el boundary correcto para FormData
   } else if (body) {
@@ -93,46 +146,44 @@ export async function apiRequest<T>(
     }
   }
 
-  let response: Response;
-  try {
-    response = await fetch(`${API_URL}${path}`, {
-      method,
-      headers,
-      body: requestBody,
-    });
-  } catch (err) {
-    console.warn(`[PetMatch API] Falló petición a ${API_URL}${path}:`, err);
-    // Si la conexión local falló, reintentar automáticamente contra Render en la nube
-    const renderFallback = "https://petmatch-backend-japt.onrender.com";
-    if (API_URL !== renderFallback) {
-      try {
-        response = await fetch(`${renderFallback}${path}`, {
-          method,
-          headers,
-          body: requestBody,
-        });
-      } catch (fallbackErr) {
-        console.warn(`[PetMatch API] Falló fallback a ${renderFallback}${path}:`, fallbackErr);
-        throw new ApiRequestError(
-          "No se pudo conectar con el servidor. Revisa tu conexión.",
-          0,
-        );
+  const init: RequestInit = { method, headers, body: requestBody };
+  const intentar = async (baseUrl: string): Promise<Response> => {
+    try {
+      return await fetchConTimeout(`${baseUrl}${path}`, init, timeoutMs);
+    } catch (err) {
+      if (err instanceof TimeoutError) {
+        console.warn(`[PetMatch API] Timeout (${timeoutMs} ms) en ${method} ${baseUrl}${path}`);
+        throw new ApiRequestError(MENSAJE_TIMEOUT, STATUS_TIMEOUT);
       }
-    } else {
+      console.warn(`[PetMatch API] Falló petición a ${baseUrl}${path}:`, err);
+      const raw = err instanceof Error ? err.message : "";
       throw new ApiRequestError(
-        "No se pudo conectar con el servidor. Revisa tu conexión.",
-        0,
+        /network request failed/i.test(raw) ? MENSAJE_OKHTTP : MENSAJE_SIN_CONEXION,
+        STATUS_SIN_CONEXION,
       );
     }
+  };
+
+  let response: Response;
+  try {
+    response = await intentar(API_URL);
+  } catch (err) {
+    // Solo ante falla de red (no timeout) se reintenta contra Render, p. ej. si el backend local está apagado.
+    const sinConexion = err instanceof ApiRequestError && err.status === STATUS_SIN_CONEXION;
+    if (!sinConexion || API_URL === PRODUCTION_API_URL) throw err;
+    response = await intentar(PRODUCTION_API_URL);
   }
 
-  const data = await response.json().catch(() => ({}));
+  const texto = await response.text().catch(() => "");
+  let data: unknown = texto;
+  try {
+    data = texto ? JSON.parse(texto) : {};
+  } catch {
+    // Respuesta no JSON (p. ej. página HTML 502 de Render): se conserva el texto.
+  }
 
   if (!response.ok) {
-    throw new ApiRequestError(
-      data?.detail || data?.error || data?.mensaje || "Ocurrió un error inesperado",
-      response.status,
-    );
+    throw new ApiRequestError(mensajeDelBackend(data, response.status), response.status);
   }
 
   return data as T;

@@ -14,6 +14,7 @@ export async function crearAlerta(
     method: "POST",
     body: fd,
     auth: conSesion,
+    timeoutMs: 60_000,
   });
 }
 
