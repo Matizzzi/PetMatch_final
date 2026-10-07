@@ -100,7 +100,8 @@ export async function apiRequest<T>(
       headers,
       body: requestBody,
     });
-  } catch {
+  } catch (err) {
+    console.warn(`[PetMatch API] Falló petición a ${API_URL}${path}:`, err);
     // Si la conexión local falló, reintentar automáticamente contra Render en la nube
     const renderFallback = "https://petmatch-backend-japt.onrender.com";
     if (API_URL !== renderFallback) {
@@ -110,7 +111,8 @@ export async function apiRequest<T>(
           headers,
           body: requestBody,
         });
-      } catch {
+      } catch (fallbackErr) {
+        console.warn(`[PetMatch API] Falló fallback a ${renderFallback}${path}:`, fallbackErr);
         throw new ApiRequestError(
           "No se pudo conectar con el servidor. Revisa tu conexión.",
           0,
@@ -128,7 +130,7 @@ export async function apiRequest<T>(
 
   if (!response.ok) {
     throw new ApiRequestError(
-      data?.error || "Ocurrió un error inesperado",
+      data?.detail || data?.error || data?.mensaje || "Ocurrió un error inesperado",
       response.status,
     );
   }
