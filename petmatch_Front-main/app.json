@@ -44,7 +44,16 @@
       ],
       "expo-status-bar",
       "expo-secure-store",
-      "expo-font"
+      "expo-font",
+      "expo-sharing",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "PetMatch necesita acceso a tus fotos para guardar los afiches de búsqueda.",
+          "savePhotosPermission": "PetMatch guarda en tu galería los afiches de búsqueda que generas.",
+          "granularPermissions": ["photo"]
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

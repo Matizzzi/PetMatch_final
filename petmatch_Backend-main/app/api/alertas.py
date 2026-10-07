@@ -7,7 +7,7 @@ from app.api.deps import get_optional_current_user
 from app.api.forms import alerta_create_form
 from app.core.database import get_db
 from app.models.usuario import Usuario
-from app.schemas.alerta import AlertaCreateForm, AlertaCreateResponse, AlertasListResponse
+from app.schemas.alerta import AlertaCreateForm, AlertaCreateResponse, AlertaResponse, AlertasListResponse
 from app.services import alertas_service
 
 router = APIRouter()
@@ -17,6 +17,15 @@ router = APIRouter()
 def list_alertas(incluir_resueltas: bool = True, db: Session = Depends(get_db)):
     """Lista todas las alertas ordenadas por estado activo, urgencia y fecha."""
     return {"alertas": alertas_service.listar_alertas(db, incluir_resueltas)}
+
+
+@router.get("/{alerta_id}", response_model=AlertaResponse)
+def get_alerta(alerta_id: str, db: Session = Depends(get_db)):
+    """Detalle público de una alerta (destino del código QR del afiche)."""
+    alerta = alertas_service.obtener_alerta(db, alerta_id)
+    if not alerta:
+        raise HTTPException(status_code=404, detail="Alerta no encontrada")
+    return alerta
 
 
 @router.patch("/{alerta_id}/resolver")

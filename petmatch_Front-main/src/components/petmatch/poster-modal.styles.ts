@@ -13,7 +13,7 @@ export function getPosterModalStyles(colors: Record<ThemeColor, string>) {
     scrollWrap: {
       width: "100%",
       maxWidth: 440,
-      maxHeight: "92%",
+      maxHeight: "94%",
     },
     scrollContent: {
       paddingBottom: 24,
@@ -50,246 +50,50 @@ export function getPosterModalStyles(colors: Record<ThemeColor, string>) {
     topTitleRow: {
       flexDirection: "row",
       alignItems: "center",
-      gap: 6,
+      gap: 8,
+      flex: 1,
     },
     topTitle: {
       fontWeight: "700",
       fontSize: 15,
       color: colors.text,
     },
+    topSubtitle: {
+      fontSize: 11,
+      lineHeight: 14,
+      color: colors.textSecondary,
+    },
     closeButton: {
       padding: 4,
     },
 
-    // El Afiche en sí (Diseño Visual de Alto Impacto)
-    posterPaper: {
-      backgroundColor: "#FFFFFF",
-      margin: 14,
-      borderRadius: 18,
+    previewWrap: {
+      alignItems: "center",
+      paddingVertical: 16,
+    },
+    previewFrame: {
+      borderRadius: 14,
       overflow: "hidden",
-      borderWidth: 2,
-      borderColor: "#DC2626", // Rojo Alerta
       ...Platform.select({
         web: {
-          boxShadow: "0 6px 18px rgba(220, 38, 38, 0.15)",
+          boxShadow: "0 8px 24px rgba(220, 38, 38, 0.25)",
         },
         default: {
-          elevation: 4,
+          elevation: 6,
           shadowColor: "#DC2626",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.2,
-          shadowRadius: 8,
+          shadowOffset: { width: 0, height: 6 },
+          shadowOpacity: 0.25,
+          shadowRadius: 12,
         },
       }),
     },
-    posterHeader: {
-      backgroundColor: "#DC2626",
-      paddingVertical: 12,
+
+    actions: {
       paddingHorizontal: 16,
-      alignItems: "center",
-    },
-    headerBadge: {
-      backgroundColor: "#FEF08A",
-      paddingHorizontal: 12,
-      paddingVertical: 3,
-      borderRadius: 12,
-      marginBottom: 4,
-    },
-    headerBadgeText: {
-      color: "#991B1B",
-      fontWeight: "900",
-      fontSize: 11,
-      letterSpacing: 1,
-      textTransform: "uppercase",
-    },
-    posterMainHeading: {
-      color: "#FFFFFF",
-      fontSize: 26,
-      fontWeight: "900",
-      letterSpacing: 1.5,
-      textAlign: "center",
-    },
-    posterSubheading: {
-      color: "#FECACA",
-      fontSize: 12,
-      fontWeight: "700",
-      letterSpacing: 0.5,
-      marginTop: 2,
-      textTransform: "uppercase",
-    },
-
-    // Foto de la Mascota
-    photoSection: {
-      position: "relative",
-      backgroundColor: "#F3F4F6",
-      height: 240,
-      width: "100%",
-      alignItems: "center",
-      justifyContent: "center",
-      overflow: "hidden",
-      borderBottomWidth: 2,
-      borderBottomColor: "#EF4444",
-    },
-    petPhoto: {
-      width: "100%",
-      height: "100%",
-    },
-    photoPlaceholder: {
-      alignItems: "center",
-      justifyContent: "center",
-    },
-    urgentRibbon: {
-      position: "absolute",
-      top: 12,
-      right: 12,
-      backgroundColor: "#DC2626",
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 4,
-      paddingHorizontal: 10,
-      paddingVertical: 4,
-      borderRadius: 20,
-      ...Platform.select({
-        web: {
-          boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
-        },
-      }),
-    },
-    urgentRibbonText: {
-      color: "#FFFFFF",
-      fontWeight: "800",
-      fontSize: 11,
-      letterSpacing: 0.5,
-    },
-
-    // Información Central
-    posterBody: {
-      padding: 16,
-      alignItems: "center",
-    },
-    petName: {
-      fontSize: 28,
-      fontWeight: "900",
-      color: "#111827",
-      textAlign: "center",
-      marginBottom: 8,
-      letterSpacing: 0.5,
-    },
-    detailsGrid: {
-      flexDirection: "row",
-      flexWrap: "wrap",
-      gap: 6,
-      justifyContent: "center",
-      marginBottom: 12,
-    },
-    badgeItem: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 4,
-      backgroundColor: "#F3F4F6",
-      paddingHorizontal: 10,
-      paddingVertical: 5,
-      borderRadius: 8,
-      borderWidth: 1,
-      borderColor: "#E5E7EB",
-    },
-    badgeText: {
-      fontSize: 12,
-      color: "#374151",
-      fontWeight: "600",
-    },
-    badgeSpecial: {
-      backgroundColor: "#FEF3C7",
-      borderColor: "#FDE68A",
-    },
-    badgeSpecialText: {
-      color: "#92400E",
-    },
-    descCard: {
-      backgroundColor: "#F9FAFB",
-      borderLeftWidth: 3,
-      borderLeftColor: "#DC2626",
-      padding: 10,
-      borderRadius: 6,
-      width: "100%",
-      marginBottom: 14,
-    },
-    descText: {
-      color: "#4B5563",
-      fontSize: 13,
-      lineHeight: 18,
-      fontStyle: "italic",
-    },
-
-    // Caja de Contacto
-    contactBox: {
-      backgroundColor: "#25D366",
-      width: "100%",
-      borderRadius: 14,
-      paddingVertical: 12,
-      paddingHorizontal: 14,
-      alignItems: "center",
-      justifyContent: "center",
-      ...Platform.select({
-        web: {
-          boxShadow: "0 4px 12px rgba(37, 211, 102, 0.35)",
-        },
-      }),
-    },
-    contactHelpText: {
-      color: "#064E3B",
-      fontSize: 11,
-      fontWeight: "800",
-      letterSpacing: 0.5,
-      textTransform: "uppercase",
-      marginBottom: 2,
-    },
-    contactPhoneRow: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-    },
-    contactPhone: {
-      color: "#FFFFFF",
-      fontSize: 22,
-      fontWeight: "900",
-      letterSpacing: 1,
-    },
-
-    // Pie de Afiche
-    posterFooter: {
-      backgroundColor: "#1F2937",
-      paddingVertical: 8,
-      paddingHorizontal: 16,
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-    },
-    footerBrand: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 5,
-    },
-    footerBrandText: {
-      color: "#FFFFFF",
-      fontWeight: "800",
-      fontSize: 12,
-    },
-    footerTagline: {
-      color: "#9CA3AF",
-      fontSize: 10,
-      fontWeight: "500",
-    },
-
-    // Botones de Acción Fuera del Afiche
-    actionButtonsRow: {
-      paddingHorizontal: 16,
-      paddingTop: 4,
       paddingBottom: 20,
-      gap: 12,
+      gap: 10,
     },
-    downloadBtn: {
-      backgroundColor: colors.tint,
+    actionBtn: {
       flexDirection: "row",
       alignItems: "center",
       justifyContent: "center",
@@ -297,98 +101,21 @@ export function getPosterModalStyles(colors: Record<ThemeColor, string>) {
       paddingVertical: 14,
       borderRadius: 14,
     },
-    downloadBtnText: {
+    downloadBtn: {
+      backgroundColor: colors.tint,
+    },
+    whatsappBtn: {
+      backgroundColor: "#25D366",
+    },
+    actionBtnText: {
       color: "#FFFFFF",
       fontWeight: "700",
       fontSize: 15,
     },
-
-    // Sección de Redes Sociales
-    socialSection: {
-      marginTop: 4,
-      gap: 8,
-    },
-    socialHeader: {
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "space-between",
-    },
-    socialTitle: {
-      fontSize: 13,
-      fontWeight: "700",
+    hintText: {
+      fontSize: 12,
+      textAlign: "center",
       color: colors.textSecondary,
-      textTransform: "uppercase",
-      letterSpacing: 0.5,
-    },
-    socialGrid: {
-      flexDirection: "row",
-      gap: 8,
-    },
-    socialBtn: {
-      flex: 1,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 6,
-      paddingVertical: 11,
-      borderRadius: 12,
-      ...Platform.select({
-        web: {
-          transition: "transform 0.15s ease, opacity 0.15s ease",
-        },
-      }),
-    },
-    btnWhatsApp: {
-      backgroundColor: "#25D366",
-    },
-    btnInstagram: {
-      backgroundColor: "#E1306C",
-    },
-    btnFacebook: {
-      backgroundColor: "#1877F2",
-    },
-    socialBtnText: {
-      color: "#FFFFFF",
-      fontWeight: "700",
-      fontSize: 12,
-    },
-    utilityRow: {
-      flexDirection: "row",
-      gap: 8,
-    },
-    copyBtn: {
-      flex: 1,
-      backgroundColor: colors.cardMuted,
-      borderWidth: 1,
-      borderColor: colors.border,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 6,
-      paddingVertical: 10,
-      borderRadius: 12,
-    },
-    copyBtnText: {
-      color: colors.text,
-      fontWeight: "600",
-      fontSize: 12,
-    },
-    nativeShareBtn: {
-      flex: 1,
-      backgroundColor: colors.cardMuted,
-      borderWidth: 1,
-      borderColor: colors.border,
-      flexDirection: "row",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: 6,
-      paddingVertical: 10,
-      borderRadius: 12,
-    },
-    nativeShareText: {
-      color: colors.text,
-      fontWeight: "600",
-      fontSize: 12,
     },
     noticeBanner: {
       backgroundColor: "#ECFDF5",
@@ -406,6 +133,13 @@ export function getPosterModalStyles(colors: Record<ThemeColor, string>) {
       fontSize: 12,
       fontWeight: "600",
       flex: 1,
+    },
+    noticeError: {
+      backgroundColor: "#FEF2F2",
+      borderColor: "#FECACA",
+    },
+    noticeErrorText: {
+      color: "#991B1B",
     },
   });
 }

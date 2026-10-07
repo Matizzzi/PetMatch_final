@@ -11,8 +11,11 @@ type ImagePickerApi = typeof ImagePickerModule;
 function cargarImagePicker(): ImagePickerApi | null {
   try {
     // eslint-disable-next-line @typescript-eslint/no-require-imports
-    return require("expo-image-picker") as ImagePickerApi;
-  } catch {
+    const mod = require("expo-image-picker");
+    const api = (mod?.launchImageLibraryAsync ? mod : mod?.default) as ImagePickerApi;
+    return api || null;
+  } catch (err: any) {
+    console.warn("[PetMatch] Error cargando expo-image-picker:", err?.message || err);
     return null;
   }
 }
@@ -32,8 +35,19 @@ export function useImagePicker({ motivoPermiso, onQuitar }: UseImagePickerOption
   const seleccionarFoto = useCallback(async () => {
     if (!ImagePicker?.launchImageLibraryAsync) {
       Alert.alert(
-        "Aviso",
-        "El selector de fotos nativo requiere una Development Build. Puedes continuar sin foto.",
+        "Modo de Prueba (Expo Go)",
+        "El selector de la galería nativa de tu teléfono requiere el APK instalado en tu celular.\n\nPara que puedas probar la pantalla, la IA y los matches ahora mismo, ¿deseas cargar una foto de mascota de prueba?",
+        [
+          { text: "Cancelar", style: "cancel" },
+          {
+            text: "Cargar foto de prueba",
+            onPress: () => {
+              setFotoUri(
+                "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=800&auto=format&fit=crop"
+              );
+            },
+          },
+        ]
       );
       return;
     }

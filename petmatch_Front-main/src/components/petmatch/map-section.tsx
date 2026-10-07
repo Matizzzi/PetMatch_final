@@ -1,10 +1,18 @@
 import { useMemo } from "react";
-import { StyleSheet, View, Text, Pressable, Linking } from "react-native";
+import { StyleSheet, View, Text, Pressable, Linking, Image } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { AlertaPerdida, ReporteAvistamiento } from "@/types/api";
 import { generateLeafletHtml } from "./map.utils";
 
-import { WebView } from "react-native-webview";
+// Carga defensiva: en Expo Go o entornos sin el módulo nativo compilado,
+// evitamos que la app crashee en el arranque si falta RNCWebViewModule.
+let WebViewComponent: any = null;
+try {
+  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  WebViewComponent = require("react-native-webview").WebView;
+} catch {
+  WebViewComponent = null;
+}
 
 interface MapSectionProps {
   alertas: AlertaPerdida[];
@@ -41,40 +49,63 @@ export default function MapSection({
     (a) => typeof a.latitud === "number" && typeof a.longitud === "number"
   );
 
-  if (!WebView) {
+  if (!WebViewComponent) {
+    const staticMapUrl = `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lng}&zoom=14&size=650x300&maptype=mapnik`;
+
     return (
-      <View style={[styles.fallbackContainer, { backgroundColor: colors.backgroundElement, borderColor: colors.border }]}>
-        <View style={styles.fallbackHeader}>
-          <View style={[styles.mapIconCircle, { backgroundColor: colors.tint + "20" }]}>
-            <Ionicons name="map" size={24} color={colors.tint} />
+      <View style={[styles.fallbackMapCard, { borderColor: colors.border, backgroundColor: colors.backgroundElement }]}>
+        {/* Imagen visual del mapa de Melipilla */}
+        <View style={styles.staticMapImageWrap}>
+          <Image
+            source={{ uri: staticMapUrl }}
+            style={styles.staticMapImage}
+            resizeMode="cover"
+          />
+
+          {/* Badge superior con leyenda */}
+          <View style={styles.mapBadgeOverlay}>
+            <View style={styles.badgeItem}>
+              <View style={[styles.badgeDot, { backgroundColor: "#EF4444" }]} />
+              <Text style={styles.badgeText}>Perdidas ({alertas.length})</Text>
+            </View>
+            <View style={styles.badgeItem}>
+              <View style={[styles.badgeDot, { backgroundColor: "#10B981" }]} />
+              <Text style={styles.badgeText}>Avistamientos ({avistamientos.length})</Text>
+            </View>
           </View>
-          <View style={{ flex: 1 }}>
-            <Text style={[styles.fallbackTitle, { color: colors.text }]}>
-              Mapa de Mascotas Perdidas
-            </Text>
-            <Text style={[styles.fallbackSubtitle, { color: colors.textSecondary }]}>
-              {alertasConUbicacion.length} alertas y {avistamientos.length} avistamientos en Melipilla
-            </Text>
+
+          {/* Pin central indicador */}
+          <View style={styles.centerPinWrap} pointerEvents="none">
+            <Ionicons name="location" size={36} color="#EF4444" />
           </View>
+
+          {/* Botón flotante para interactuar */}
+          <Pressable
+            onPress={abrirEnGoogleMaps}
+            style={({ pressed }) => [
+              styles.floatingMapBtn,
+              { backgroundColor: colors.tint, opacity: pressed ? 0.9 : 1 },
+            ]}
+          >
+            <Ionicons name="navigate-outline" size={16} color="#FFFFFF" />
+            <Text style={styles.floatingMapBtnText}>Abrir zona en Google Maps</Text>
+          </Pressable>
         </View>
 
-        <Pressable
-          onPress={abrirEnGoogleMaps}
-          style={({ pressed }) => [
-            styles.fallbackBtn,
-            { backgroundColor: colors.tint, opacity: pressed ? 0.85 : 1 },
-          ]}
-        >
-          <Ionicons name="navigate-outline" size={18} color="#FFFFFF" />
-          <Text style={styles.fallbackBtnText}>Ver zona en Google Maps</Text>
-        </Pressable>
+        {/* Pie informativo */}
+        <View style={styles.fallbackFooter}>
+          <Ionicons name="information-circle-outline" size={16} color={colors.textSecondary} />
+          <Text style={[styles.fallbackFooterText, { color: colors.textSecondary }]}>
+            En Expo Go el mapa interactivo se visualiza con este mapa base de Melipilla.
+          </Text>
+        </View>
       </View>
     );
   }
 
   return (
     <View style={[styles.mapContainer, { borderColor: colors.border }]}>
-      <WebView
+      <WebViewComponent
         originWhitelist={["*"]}
         source={{ html: mapHtml, baseUrl: "https://cdnjs.cloudflare.com" }}
         style={styles.map}
@@ -101,34 +132,65 @@ const styles = StyleSheet.create({
     width: "100%",
     height: "100%",
   },
-  fallbackContainer: {
+  fallbackMapCard: {
     borderRadius: 24,
     borderWidth: 1.5,
-    padding: 16,
+    overflow: "hidden",
     marginVertical: 12,
-    gap: 12,
   },
-  fallbackHeader: {
+  staticMapImageWrap: {
+    height: 220,
+    width: "100%",
+    position: "relative",
+    backgroundColor: "#E5E7EB",
+  },
+  staticMapImage: {
+    width: "100%",
+    height: "100%",
+  },
+  mapBadgeOverlay: {
+    position: "absolute",
+    top: 10,
+    left: 10,
+    right: 10,
+    flexDirection: "row",
+    gap: 8,
+    backgroundColor: "rgba(255, 255, 255, 0.92)",
+    paddingVertical: 6,
+    paddingHorizontal: 12,
+    borderRadius: 12,
+    shadowColor: "#000",
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  badgeItem: {
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 5,
   },
-  mapIconCircle: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    alignItems: "center",
-    justifyContent: "center",
+  badgeDot: {
+    width: 9,
+    height: 9,
+    borderRadius: 5,
   },
-  fallbackTitle: {
-    fontSize: 16,
+  badgeText: {
+    fontSize: 11,
     fontWeight: "700",
+    color: "#1F2937",
   },
-  fallbackSubtitle: {
-    fontSize: 13,
-    marginTop: 2,
+  centerPinWrap: {
+    position: "absolute",
+    top: "35%",
+    left: "50%",
+    marginLeft: -18,
+    marginTop: -18,
   },
-  fallbackBtn: {
+  floatingMapBtn: {
+    position: "absolute",
+    bottom: 12,
+    left: 16,
+    right: 16,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
@@ -136,10 +198,25 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 14,
     gap: 8,
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 6,
+    elevation: 4,
   },
-  fallbackBtnText: {
+  floatingMapBtnText: {
     color: "#FFFFFF",
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: "700",
+  },
+  fallbackFooter: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  fallbackFooterText: {
+    fontSize: 11,
+    flex: 1,
   },
 });

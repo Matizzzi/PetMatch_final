@@ -1,4 +1,4 @@
-import type { AlertaCreateResponse } from "@/types/api";
+import type { AlertaCreateResponse, AlertaPerdida } from "@/types/api";
 import type { CrearAlertaRequest } from "@/types/requests";
 import { apiRequest } from "./api";
 import { adjuntarFoto, crearFormData } from "./form-data";
@@ -15,4 +15,9 @@ export async function crearAlerta(
     body: fd,
     auth: conSesion,
   });
+}
+
+/** GET /api/alertas/{id} — detalle público de una alerta. */
+export function obtenerAlerta(id: string): Promise<AlertaPerdida> {
+  return apiRequest<AlertaPerdida>(`/api/alertas/${encodeURIComponent(id)}`);
 }
