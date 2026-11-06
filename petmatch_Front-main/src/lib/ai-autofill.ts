@@ -24,7 +24,10 @@ function descripcionDesdeIA(a: AnalisisIA): string {
  * desmarca) para no pisar una decisión explícita del usuario.
  */
 export function camposDesdeAnalisis(a: AnalisisIA): Partial<CamposAutocompletables> {
-  const campos: Partial<CamposAutocompletables> = { especie: especieDesdeIA(a.especie) };
+  const campos: Partial<CamposAutocompletables> = {};
+  if (a.especie === "perro" || a.especie === "gato") {
+    campos.especie = especieDesdeIA(a.especie);
+  }
 
   const descripcion = descripcionDesdeIA(a);
   if (descripcion) campos.descripcion = descripcion;

@@ -9,7 +9,7 @@ interface AiAnalyzeButtonProps {
   onPress: () => void;
 }
 
-/** Dispara el análisis de la foto con Gemini Vision. */
+/** Dispara el análisis automático de la foto. */
 export function AiAnalyzeButton({ analizando, onPress }: AiAnalyzeButtonProps) {
   const { colors } = useAppTheme();
 
@@ -37,11 +37,11 @@ export function AiAnalyzeButton({ analizando, onPress }: AiAnalyzeButtonProps) {
           <Ionicons name="sparkles" size={20} color="#FFFFFF" />
         )}
         <ThemedText style={styles.label}>
-          {analizando ? "Analizando con Gemini..." : "Analizar con IA"}
+          {analizando ? "Analizando foto..." : "Analizar con IA"}
         </ThemedText>
       </Pressable>
       <ThemedText type="small" themeColor="textSecondary" style={styles.hint}>
-        Gemini Vision detecta raza, color, tamaño y estado de salud automáticamente
+        Detecta pelaje y completa la descripción. Con Groq o Gemini también estima raza.
       </ThemedText>
     </View>
   );

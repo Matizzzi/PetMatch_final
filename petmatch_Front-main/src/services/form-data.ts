@@ -1,17 +1,24 @@
 import { Platform } from "react-native";
 
-import { asegurarFotoUrlTexto, esFotoTexto } from "@/lib/image-encoding";
+import { asegurarFotoUrlTexto, dataUrlABlob, esDataUrl, esFotoTexto } from "@/lib/image-encoding";
 
 type ValorCampo = string | number | boolean | null | undefined;
 
 /**
- * Adjunta una foto al FormData como texto en `fotoUrl` (Data URL o URL remota).
- * En Android no se adjunta nunca un archivo `file://` / `content://`: OkHttp
- * lanza "TypeError: Network request failed" al leer esos streams (Scoped Storage).
+ * Adjunta una foto al FormData. Los Data URL van como archivo `foto` para no
+ * chocar el límite de 1 MB de Starlette en campos de texto. En Android no se
+ * adjunta nunca un `file://` / `content://` (OkHttp aborta esos streams).
  */
 export async function adjuntarFoto(fd: FormData, uri: string, nombreBase: string): Promise<void> {
   const uriLimpia = uri?.trim();
   if (!uriLimpia) return;
+
+  if (esDataUrl(uriLimpia)) {
+    const blob = dataUrlABlob(uriLimpia);
+    const ext = blob.type.includes("png") ? "png" : "jpg";
+    fd.append("foto", blob, `${nombreBase}.${ext}`);
+    return;
+  }
 
   if (esFotoTexto(uriLimpia)) {
     fd.append("fotoUrl", uriLimpia);
@@ -19,7 +26,14 @@ export async function adjuntarFoto(fd: FormData, uri: string, nombreBase: string
   }
 
   try {
-    fd.append("fotoUrl", await asegurarFotoUrlTexto(uriLimpia));
+    const texto = await asegurarFotoUrlTexto(uriLimpia);
+    if (esDataUrl(texto)) {
+      const blob = dataUrlABlob(texto);
+      const ext = blob.type.includes("png") ? "png" : "jpg";
+      fd.append("foto", blob, `${nombreBase}.${ext}`);
+      return;
+    }
+    fd.append("fotoUrl", texto);
     return;
   } catch (err) {
     if (Platform.OS !== "web") throw err;

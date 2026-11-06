@@ -29,6 +29,7 @@ export function usePhotoAnalysis(motivoPermiso: string, onAnalisis: (a: Analisis
     foto,
     analizando: ia.analizando,
     resultado: ia.resultado,
+    error: ia.error,
     analizar: analizarFotoActual,
     reset,
   };

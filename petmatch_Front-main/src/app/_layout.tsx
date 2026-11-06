@@ -4,7 +4,7 @@ import { SpecialElite_400Regular } from "@expo-google-fonts/special-elite";
 import { useFonts } from "expo-font";
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import { AuthProvider } from "@/contexts/auth-context";
 import { AppThemeProvider, useAppTheme } from "@/contexts/theme-context";
@@ -30,27 +30,18 @@ export default function RootLayout() {
     SpecialElite_400Regular,
   });
 
-  const [ready, setReady] = useState(false);
-
   useEffect(() => {
     if (fontsLoaded || fontError) {
       SplashScreen.hideAsync().catch(() => {});
-      setReady(true);
     }
   }, [fontsLoaded, fontError]);
 
-  // Timeout de seguridad de 1 segundo: si las fuentes tardan o fallan, muestra la app igual
   useEffect(() => {
     const timer = setTimeout(() => {
       SplashScreen.hideAsync().catch(() => {});
-      setReady(true);
     }, 1000);
     return () => clearTimeout(timer);
   }, []);
-
-  if (!ready && !fontsLoaded && !fontError) {
-    return null;
-  }
 
   return (
     <AppThemeProvider>

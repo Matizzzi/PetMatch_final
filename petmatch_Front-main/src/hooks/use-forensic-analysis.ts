@@ -10,7 +10,7 @@ const urlAbsoluta = (url?: string | null) => resolveFotoUrl(url) || url || "";
 
 /**
  * Peritajes biométricos por match. Los informes se cachean por `matchId`
- * durante la vida del modal para no repetir llamadas costosas a Gemini.
+ * durante la vida del modal para no repetir llamadas a la API de visión.
  */
 export function useForensicAnalysis() {
   const [informes, setInformes] = useState<Record<string, InformeForense>>({});

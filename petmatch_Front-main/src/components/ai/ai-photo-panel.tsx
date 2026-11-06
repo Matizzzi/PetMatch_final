@@ -1,3 +1,4 @@
+import { ErrorBanner } from "@/components/forms/feedback";
 import { ImagePickerSection } from "@/components/forms/image-picker-section";
 import type { PhotoAnalysisState } from "@/hooks/use-photo-analysis";
 import { AiAnalysisSummary } from "./ai-analysis-summary";
@@ -16,7 +17,7 @@ interface AiPhotoPanelProps {
  * Compartido por las pantallas de alerta y avistamiento.
  */
 export function AiPhotoPanel({ state, label, placeholderTitle, placeholderHint }: AiPhotoPanelProps) {
-  const { foto, analizando, resultado, analizar } = state;
+  const { foto, analizando, resultado, error, analizar } = state;
 
   return (
     <>
@@ -29,6 +30,7 @@ export function AiPhotoPanel({ state, label, placeholderTitle, placeholderHint }
         onQuitar={foto.quitarFoto}
       />
       {foto.fotoUri && <AiAnalyzeButton analizando={analizando} onPress={analizar} />}
+      {error ? <ErrorBanner message={error} /> : null}
       {resultado && <AiAnalysisSummary analisis={resultado} />}
       {resultado?.nivelUrgencia && <AiTriageBadge triaje={resultado} />}
     </>

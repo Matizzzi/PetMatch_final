@@ -19,6 +19,8 @@ services:
       - ALGORITHM=${ALGORITHM}
       - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES}
       - BASE_URL=${BASE_URL}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GROQ_API_KEY=${GROQ_API_KEY}
     volumes:
       - ./petmatch_Backend-main/uploads:/app/uploads
       - ./petmatch_Backend-main/app:/app/app

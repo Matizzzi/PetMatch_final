@@ -95,8 +95,7 @@ export function ForensicReport({ informe }: { informe: InformeForense }) {
         <View style={styles.recomBox}>
           <Ionicons name="checkmark-circle-outline" size={16} color={colors.whatsapp} style={{ marginTop: 1 }} />
           <ThemedText style={styles.recomText}>
-            <ThemedText style={{ fontWeight: "700" }}>Recomendación Pericial: </ThemedText>
-            {informe.recomendacion}
+            Recomendación Pericial: {informe.recomendacion}
           </ThemedText>
         </View>
       )}

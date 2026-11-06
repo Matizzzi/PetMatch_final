@@ -32,8 +32,7 @@ export function AiTriageBadge({ triaje }: { triaje: TriajeIA }) {
         <View style={styles.row}>
           <Ionicons name="body-outline" size={14} color={color} />
           <ThemedText type="small" style={styles.flex}>
-            <ThemedText type="smallBold">Condición corporal:</ThemedText> {condicionCorporal.puntaje}/5 ·{" "}
-            {condicionCorporal.descripcion}
+            Condición corporal: {condicionCorporal.puntaje}/5 · {condicionCorporal.descripcion}
           </ThemedText>
         </View>
       )}
@@ -46,8 +45,7 @@ export function AiTriageBadge({ triaje }: { triaje: TriajeIA }) {
           style={styles.iconTop}
         />
         <ThemedText type="small" style={styles.flex}>
-          <ThemedText type="smallBold">Lesiones:</ThemedText>{" "}
-          {lesionesVisibles ? descripcionLesiones || "Detectadas" : "No se observan lesiones visibles"}
+          Lesiones: {lesionesVisibles ? descripcionLesiones || "Detectadas" : "No se observan lesiones visibles"}
         </ThemedText>
       </View>
 

@@ -25,8 +25,7 @@ export function MatchDetails({ alerta, avistamiento: av }: MatchDetailsProps) {
         <View style={styles.detailRow}>
           <Ionicons name="location" size={15} color={colors.tint} />
           <ThemedText type="small" style={{ flex: 1 }}>
-            <ThemedText type="defaultSemiBold">Lugar: </ThemedText>
-            {av.comuna || "Sector reportado"}
+            Lugar: {av.comuna || "Sector reportado"}
           </ThemedText>
         </View>
         <View style={styles.detailRow}>

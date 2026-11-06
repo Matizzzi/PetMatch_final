@@ -1,5 +1,5 @@
 /**
- * Contratos de los endpoints de IA (`/api/ia/*`), respaldados por Gemini Vision.
+ * Contratos de los endpoints de IA (`/api/ia/*`).
  */
 
 export type NivelUrgencia = "ALTA" | "MEDIA" | "BAJA";

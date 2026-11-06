@@ -1,4 +1,4 @@
-import { asegurarFotoUrlTexto } from "@/lib/image-encoding";
+import { asegurarFotoUrlTexto, dataUrlABlob, esDataUrl } from "@/lib/image-encoding";
 import type {
   AnalisisIA,
   AnalisisIAResponse,
@@ -8,7 +8,7 @@ import type {
 } from "@/types/ai";
 import { apiRequest, ApiRequestError } from "./api";
 
-/** Cold start de Render (~50 s) + inferencia de Gemini (5-15 s). */
+/** Cold start de Render (~50 s) + inferencia de visión (5-15 s). */
 const TIMEOUT_IA_MS = 90_000;
 
 async function pedirAnalisis(body: { fotoUrl: string } | FormData): Promise<AnalisisIA> {
@@ -21,20 +21,30 @@ async function pedirAnalisis(body: { fotoUrl: string } | FormData): Promise<Anal
   return res.analisis;
 }
 
+function armarFormDataFoto(fotoUrl: string): FormData {
+  const fd = new FormData();
+  if (esDataUrl(fotoUrl)) {
+    const blob = dataUrlABlob(fotoUrl);
+    const ext = blob.type.includes("png") ? "png" : "jpg";
+    fd.append("foto", blob, `mascota.${ext}`);
+    return fd;
+  }
+  fd.append("fotoUrl", fotoUrl);
+  return fd;
+}
+
 /**
- * POST /api/ia/analizar. Render en producción solo parsea multipart (`fotoUrl` texto).
- * JSON se intenta después por si el backend ya acepta `{ fotoUrl }`.
- * Nunca se envía `file://` / `content://`: OkHttp aborta esos streams en Android.
+ * POST /api/ia/analizar.
+ * En web se manda el archivo en `foto` (Starlette corta los Data URL de texto a 1 MB).
+ * Si el multipart falla, se reintenta JSON `{ fotoUrl }`.
  */
 export async function analizarFoto(fotoUri: string): Promise<AnalisisIA> {
   const fotoUrl = await asegurarFotoUrlTexto(fotoUri);
-  const fd = new FormData();
-  fd.append("fotoUrl", fotoUrl);
   try {
-    return await pedirAnalisis(fd);
+    return await pedirAnalisis(armarFormDataFoto(fotoUrl));
   } catch (err) {
     const status = err instanceof ApiRequestError ? err.status : 0;
-    if (status !== 400 && status !== 415 && status !== 422) throw err;
+    if (status !== 400 && status !== 413 && status !== 415 && status !== 422) throw err;
     return pedirAnalisis({ fotoUrl });
   }
 }

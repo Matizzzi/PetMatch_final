@@ -1,7 +1,7 @@
 # 🐾 PetMatch — Plataforma de Rescate y Búsqueda de Mascotas Perdidas
 
 > **Proyecto de Título de Ingeniería de Software**  
-> Plataforma comunitaria integral para reporte, rescate y encuentro de mascotas perdidas mediante geolocalización, matching heurístico multivariable e Inteligencia Artificial Multimodal (Google Gemini Vision).
+> Plataforma comunitaria para reportar mascotas perdidas y avistamientos, con geolocalización, matching heurístico e inteligencia artificial de visión.
 
 ---
 
@@ -19,7 +19,7 @@ Ejecuta en la raíz de esta carpeta:
 docker compose up -d --build
 ```
 
-> **Nota:** El archivo `.env` ya viene preconfigurado con la base de datos en la nube (Neon PostgreSQL). Además, el archivo `docker-compose.yml` cuenta con valores por defecto automáticos, por lo que **funcionará directamente sin necesidad de configuración manual**.
+> **Claves:** copia `.env.example` a `.env` y completa `DATABASE_URL`, `JWT_SECRET` y, si usas IA, `GROQ_API_KEY`. **Nunca subas el `.env`** a GitHub.
 
 ---
 
@@ -56,7 +56,7 @@ Una vez iniciado Docker, los servicios estarán disponibles en:
 │            FastAPI + Python 3.11              │
 │  - Autenticación JWT / Sesión Comunitaria     │
 │  - Heurística de Coincidencia (55% D, 25% T, 20% P)
-│  - Visión Computacional Multimodal (Gemini)   │
+│  - Visión (Groq / Gemini / análisis local)    │
 │  - Subida y almacenamiento de fotos /uploads  │
 └───────────────────────┬───────────────────────┘
                         │
@@ -99,7 +99,7 @@ Una vez iniciado Docker, los servicios estarán disponibles en:
 ## 🐾 Funcionalidades Principales
 
 1. **Exploración Georreferenciada**: Mapa interactivo con marcadores diferenciados de mascotas perdidas y avistamientos de animales callejeros (foco inicial: Melipilla, Chile).
-2. **Reporte de Pérdida con IA**: Generación de alertas con carga de fotos, señas particulares y análisis morfológico automático mediante Gemini Vision.
+2. **Reporte de Pérdida con IA**: alertas con foto, señas y análisis morfológico automático (Groq o Gemini).
 3. **Reportes Comunitarios de Avistamientos**: Reporte rápido por testigos con geolocalización y contacto WhatsApp directo.
 4. **Algoritmo de Matching Heurístico**:
    - Validación estricta de especie (perro/gato).

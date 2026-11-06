@@ -11,9 +11,8 @@ function Atributo({ icon, label, valor }: { icon: IoniconName; label: string; va
   return (
     <View style={styles.row}>
       <Ionicons name={icon} size={14} color={colors.tint} />
-      <ThemedText type="small">
-        <ThemedText type="smallBold">{label}:</ThemedText> {valor}
-      </ThemedText>
+      <ThemedText type="smallBold">{label}:</ThemedText>
+      <ThemedText type="small">{valor}</ThemedText>
     </View>
   );
 }
