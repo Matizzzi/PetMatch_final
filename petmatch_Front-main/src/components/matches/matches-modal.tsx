@@ -52,7 +52,13 @@ export function MatchesModal({ alerta, visible, onClose }: MatchesModalProps) {
   };
 
   return (
-    <Modal visible={visible} animationType="slide" transparent onRequestClose={onClose}>
+    <Modal
+      visible={visible}
+      animationType="slide"
+      transparent
+      statusBarTranslucent
+      onRequestClose={onClose}
+    >
       <View style={styles.backdrop}>
         <View style={styles.sheetContainer}>
           <View style={styles.dragHandle} />
@@ -66,7 +72,7 @@ export function MatchesModal({ alerta, visible, onClose }: MatchesModalProps) {
                 </ThemedText>
               </View>
               <ThemedText themeColor="textSecondary" type="small">
-                Para {alerta.mascota.nombre} ({alerta.mascota.especie})
+                Para {alerta.mascota?.nombre ?? "esta mascota"} ({alerta.mascota?.especie ?? ""})
               </ThemedText>
             </View>
             <Pressable onPress={onClose} style={styles.closeBtn} accessibilityLabel="Cerrar">

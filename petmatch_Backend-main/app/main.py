@@ -3,22 +3,26 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from app.core.config import settings
-from app.core.database import Base, engine
+from app.core.database import Base, asegurar_esquema, engine
 import app.models
 from app.api import auth, me, alertas, avistamientos, matches, vision
 
 # Auto-crear tablas en la base de datos si no existen
 try:
     Base.metadata.create_all(bind=engine)
+    asegurar_esquema()
 except Exception as e:
     print(f"Advertencia: No se pudieron sincronizar las tablas al inicio: {e}")
 
 app = FastAPI(
-    title="PetMatch API 🐾",
-    description="Backend oficial de PetMatch para rescate y búsqueda de mascotas perdidas. Compatible con Expo (React Native) y Web.",
+    title="PetMatch API",
+    description=(
+        "API REST de PetMatch: alertas de mascotas perdidas, avistamientos comunitarios, "
+        "matching heurístico (distancia, tiempo y texto) y análisis de fotografías."
+    ),
     version="1.0.0",
     docs_url="/docs",
-    redoc_url="/redoc"
+    redoc_url="/redoc",
 )
 
 # Configuración de CORS amplia para desarrollo móvil y web

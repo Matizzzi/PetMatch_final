@@ -3,11 +3,17 @@ from typing import Optional
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_optional_current_user
+from app.api.deps import exigir_propietario_alerta, get_current_user, get_optional_current_user
 from app.api.forms import alerta_create_form
 from app.core.database import get_db
 from app.models.usuario import Usuario
-from app.schemas.alerta import AlertaCreateForm, AlertaCreateResponse, AlertaResponse, AlertasListResponse
+from app.schemas.alerta import (
+    AlertaCreateForm,
+    AlertaCreateResponse,
+    AlertaResolverBody,
+    AlertaResponse,
+    AlertasListResponse,
+)
 from app.services import alertas_service
 
 router = APIRouter()
@@ -29,11 +35,31 @@ def get_alerta(alerta_id: str, db: Session = Depends(get_db)):
 
 
 @router.patch("/{alerta_id}/resolver")
-def marcar_alerta_resuelta(alerta_id: str, db: Session = Depends(get_db)):
-    """Marca una alerta de mascota como resuelta / reencontrada con su familia."""
+def marcar_alerta_resuelta(
+    alerta_id: str,
+    body: AlertaResolverBody,
+    db: Session = Depends(get_db),
+):
+    """Cierra la alerta con el código entregado al publicar. No requiere cuenta."""
     alerta = alertas_service.obtener_alerta(db, alerta_id)
     if not alerta:
         raise HTTPException(status_code=404, detail="Alerta no encontrada")
+    if not alerta.activa:
+        return {
+            "success": True,
+            "mensaje": "Esta alerta ya estaba marcada como reencontrada.",
+            "alerta": alerta,
+        }
+    if not alerta.codigoCierreHash:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Esta alerta se publicó antes de los códigos de cierre y no se puede cerrar desde la app.",
+        )
+    if not alertas_service.verificar_codigo_cierre(alerta, body.codigoCierre):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Código de cierre incorrecto. Es el que te dimos al publicar la alerta.",
+        )
     return {
         "success": True,
         "mensaje": "¡Mascota marcada como reencontrada!",
@@ -48,9 +74,9 @@ async def create_alerta(
     current_user: Optional[Usuario] = Depends(get_optional_current_user),
     db: Session = Depends(get_db),
 ):
-    """Crea una nueva alerta de mascota perdida (con o sin usuario registrado)."""
-    alerta = alertas_service.crear_alerta(db, datos, foto, current_user)
-    return {"success": True, "alerta": alerta}
+    """Crea una alerta comunitaria. El código de cierre se entrega solo en esta respuesta."""
+    alerta, codigo_cierre = alertas_service.crear_alerta(db, datos, foto, current_user)
+    return {"success": True, "alerta": alerta, "codigoCierre": codigo_cierre}
 
 
 @router.patch("/{alerta_id}/foto")
@@ -59,11 +85,13 @@ async def actualizar_foto_alerta(
     foto: Optional[UploadFile] = File(None),
     fotoUrl: Optional[str] = Form(None),
     db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user),
 ):
-    """Actualiza la foto de una mascota perdida y la persiste en Neon PostgreSQL."""
+    """Actualiza la foto de una mascota perdida. Solo el dueño de la alerta."""
     alerta = alertas_service.obtener_alerta(db, alerta_id)
     if not alerta or not alerta.mascota:
         raise HTTPException(status_code=404, detail="Alerta o mascota no encontrada")
+    exigir_propietario_alerta(alerta, current_user)
     return {
         "success": True,
         "mensaje": "Foto de mascota actualizada y guardada en Neon PostgreSQL",

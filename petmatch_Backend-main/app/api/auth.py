@@ -4,6 +4,7 @@ from app.core.database import get_db, generate_id
 from app.core.security import verify_password, get_password_hash, create_access_token
 from app.models.usuario import Usuario
 from app.schemas.auth import AuthRequest, AuthResponse, UsuarioResponse
+from app.services.usuarios_service import GUEST_EMAIL
 
 router = APIRouter()
 
@@ -15,6 +16,11 @@ def authenticate_or_register(data: AuthRequest, db: Session = Depends(get_db)):
     - Si el usuario no existe y envía 'nombre', lo registra y retorna sesión.
     """
     email_clean = data.email.lower().strip()
+    if email_clean == GUEST_EMAIL:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Esta cuenta es interna y no admite inicio de sesión.",
+        )
     usuario = db.query(Usuario).filter(Usuario.email == email_clean).first()
 
     if usuario:

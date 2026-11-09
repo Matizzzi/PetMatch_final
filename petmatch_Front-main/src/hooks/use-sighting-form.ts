@@ -58,7 +58,7 @@ export function useSightingForm() {
       setErrorMsg(
         mensajeDeError(
           err,
-          "No se pudo registrar el avistamiento. Revisa que el backend esté conectado.",
+          "No se pudo registrar el avistamiento. Inténtalo de nuevo en unos segundos.",
           true,
         ),
       );

@@ -16,6 +16,7 @@ interface MapSectionProps {
     latitudeDelta: number;
     longitudeDelta: number;
   };
+  suspendido?: boolean;
 }
 
 export default function MapSection({
@@ -29,6 +30,14 @@ export default function MapSection({
   const mapHtml = useMemo(
     () => generateLeafletHtml(alertas, avistamientos, initialRegion),
     [alertas, avistamientos, initialRegion]
+  );
+  const firmaMapa = useMemo(
+    () =>
+      [
+        ...alertas.map((a) => a.id),
+        ...avistamientos.map((a) => a.id),
+      ].join("|"),
+    [alertas, avistamientos],
   );
 
   return (
@@ -53,6 +62,7 @@ export default function MapSection({
       {/* Contenedor del mapa */}
       <View style={styles.mapContainer}>
         <iframe
+          key={firmaMapa}
           srcDoc={mapHtml}
           style={styles.iframe}
           title="Mapa interactivo PetMatch"

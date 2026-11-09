@@ -13,9 +13,13 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { StoryPoster } from "@/components/petmatch/story-poster";
+import { CodigoCierreModal } from "@/components/alerta/codigo-cierre-modal";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useAppTheme } from "@/contexts/theme-context";
+import { useCerrarAlerta } from "@/hooks/use-cerrar-alerta";
+import { obtenerCodigoCierre } from "@/lib/codigos-cierre";
+import { webSafeButtonRole } from "@/lib/web-a11y";
 import { buildPosterData } from "@/lib/poster";
 import { obtenerAlerta } from "@/services/alertas";
 import { ApiRequestError } from "@/services/api";
@@ -27,6 +31,12 @@ export default function AlertaPublicaScreen() {
   const { width } = useWindowDimensions();
   const [alerta, setAlerta] = useState<AlertaPerdida | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [listo, setListo] = useState(false);
+  const cierre = useCerrarAlerta(setAlerta);
+
+  useEffect(() => {
+    setListo(true);
+  }, []);
 
   useEffect(() => {
     let activo = true;
@@ -46,7 +56,7 @@ export default function AlertaPublicaScreen() {
   }, [id]);
 
   const data = useMemo(() => (alerta ? buildPosterData(alerta) : null), [alerta]);
-  const posterWidth = Math.min(width - 32, 400);
+  const posterWidth = listo ? Math.min(width - 32, 400) : 400;
 
   return (
     <ThemedView style={styles.container}>
@@ -75,6 +85,18 @@ export default function AlertaPublicaScreen() {
                 <StoryPoster data={data} width={posterWidth} />
               </View>
 
+              {alerta.activa &&
+                (alerta.tieneCodigoCierre || Boolean(obtenerCodigoCierre(alerta.id))) && (
+                <Pressable
+                  accessibilityRole={webSafeButtonRole}
+                  onPress={() => cierre.pedirCierre(alerta)}
+                  style={({ pressed }) => [styles.resolveBtn, { width: posterWidth, opacity: pressed ? 0.85 : 1 }]}
+                >
+                  <Ionicons name="home-outline" size={18} color="#FFFFFF" />
+                  <ThemedText style={styles.resolveText}>Ya volvió a casa</ThemedText>
+                </Pressable>
+              )}
+
               {data.whatsappDigits && alerta.activa && (
                 <Pressable
                   onPress={() =>
@@ -97,6 +119,15 @@ export default function AlertaPublicaScreen() {
             Ver todas las alertas en PetMatch
           </Link>
         </ScrollView>
+
+        <CodigoCierreModal
+          visible={!!cierre.pendiente}
+          nombreMascota={cierre.pendiente?.mascota.nombre ?? ""}
+          enviando={cierre.enviando}
+          error={cierre.error}
+          onCancel={cierre.cancelar}
+          onConfirm={cierre.confirmarConCodigo}
+        />
       </SafeAreaView>
     </ThemedView>
   );
@@ -117,6 +148,16 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     overflow: "hidden",
   },
+  resolveBtn: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    backgroundColor: "#059669",
+    paddingVertical: 14,
+    borderRadius: 14,
+  },
+  resolveText: { color: "#FFFFFF", fontWeight: "700", fontSize: 15 },
   resolvedBanner: {
     flexDirection: "row",
     alignItems: "center",

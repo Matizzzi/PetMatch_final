@@ -19,10 +19,7 @@ export function AiTriageBadge({ triaje }: { triaje: TriajeIA }) {
   const { condicionCorporal, lesionesVisibles, descripcionLesiones } = triaje;
 
   return (
-    <View
-      accessibilityRole="summary"
-      style={[styles.card, { backgroundColor: color + "14", borderColor: color }]}
-    >
+    <View style={[styles.card, { backgroundColor: color + "14", borderColor: color }]}>
       <View style={styles.row}>
         <Ionicons name={icon} size={20} color={color} />
         <ThemedText style={[styles.title, { color }]}>{titulo}</ThemedText>

@@ -18,8 +18,13 @@ class AlertaPerdida(Base):
     descripcionExtra = Column("descripcionExtra", String, nullable=True)
     activa = Column(Boolean, default=True, nullable=False, index=True)
     whatsapp = Column(String, nullable=True)
+    codigoCierreHash = Column("codigoCierreHash", String, nullable=True)
     createdAt = Column("createdAt", DateTime, default=lambda: datetime.now(timezone.utc), nullable=False)
 
     mascota = relationship("Mascota", back_populates="alertas")
     usuario = relationship("Usuario", back_populates="alertas")
     matches = relationship("Match", back_populates="alerta", cascade="all, delete-orphan")
+
+    @property
+    def tieneCodigoCierre(self) -> bool:
+        return bool(self.codigoCierreHash)

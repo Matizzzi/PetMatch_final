@@ -41,6 +41,12 @@ export function ThemedText({
         style,
       ]}
       {...rest}
+      // En web, role="text" se vuelve <p>. Dentro de un Pressable (button) es HTML
+      // inválido: el navegador reescribe el DOM y React 19 lanza el error #418.
+      accessibilityRole={
+        rest.accessibilityRole ??
+        (type === "title" || type === "subtitle" ? "header" : undefined)
+      }
     />
   );
 }

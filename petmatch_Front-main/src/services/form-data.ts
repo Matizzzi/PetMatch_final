@@ -4,19 +4,29 @@ import { asegurarFotoUrlTexto, dataUrlABlob, esDataUrl, esFotoTexto } from "@/li
 
 type ValorCampo = string | number | boolean | null | undefined;
 
+function appendFotoDesdeDataUrl(fd: FormData, dataUrl: string, nombreBase: string): void {
+  // Hermes/Android no acepta Blob desde ArrayBuffer ("Creating blobs from
+  // 'ArrayBuffer' and 'ArrayBufferView' are not supported"). El backend ya
+  // recibe `fotoUrl` como Data URL en el multipart.
+  if (Platform.OS !== "web") {
+    fd.append("fotoUrl", dataUrl);
+    return;
+  }
+  const blob = dataUrlABlob(dataUrl);
+  const ext = blob.type.includes("png") ? "png" : "jpg";
+  fd.append("foto", blob, `${nombreBase}.${ext}`);
+}
+
 /**
- * Adjunta una foto al FormData. Los Data URL van como archivo `foto` para no
- * chocar el límite de 1 MB de Starlette en campos de texto. En Android no se
- * adjunta nunca un `file://` / `content://` (OkHttp aborta esos streams).
+ * Adjunta una foto al FormData. En web los Data URL van como archivo `foto`
+ * (Starlette corta campos de texto a 1 MB). En nativo viajan en `fotoUrl`.
  */
 export async function adjuntarFoto(fd: FormData, uri: string, nombreBase: string): Promise<void> {
   const uriLimpia = uri?.trim();
   if (!uriLimpia) return;
 
   if (esDataUrl(uriLimpia)) {
-    const blob = dataUrlABlob(uriLimpia);
-    const ext = blob.type.includes("png") ? "png" : "jpg";
-    fd.append("foto", blob, `${nombreBase}.${ext}`);
+    appendFotoDesdeDataUrl(fd, uriLimpia, nombreBase);
     return;
   }
 
@@ -28,9 +38,7 @@ export async function adjuntarFoto(fd: FormData, uri: string, nombreBase: string
   try {
     const texto = await asegurarFotoUrlTexto(uriLimpia);
     if (esDataUrl(texto)) {
-      const blob = dataUrlABlob(texto);
-      const ext = blob.type.includes("png") ? "png" : "jpg";
-      fd.append("foto", blob, `${nombreBase}.${ext}`);
+      appendFotoDesdeDataUrl(fd, texto, nombreBase);
       return;
     }
     fd.append("fotoUrl", texto);

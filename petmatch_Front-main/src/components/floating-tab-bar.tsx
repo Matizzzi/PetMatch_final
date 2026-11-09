@@ -20,7 +20,7 @@ const ICONS_INACTIVE: Record<string, keyof typeof Ionicons.glyphMap> = {
 
 const LABELS: Record<string, string> = {
   index: "Mapa",
-  perdida: "Perdida",
+  perdida: "Alerta",
   reportar: "Reportar",
 };
 
@@ -127,6 +127,8 @@ const styles = StyleSheet.create({
     right: 0,
     alignItems: "center",
     justifyContent: "center",
+    zIndex: 30,
+    elevation: 30,
   },
   bar: {
     flexDirection: "row",

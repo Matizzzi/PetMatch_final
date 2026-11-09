@@ -30,6 +30,7 @@ class AlertaResponse(BaseModel):
     activa: bool = True
     createdAt: datetime
     mascota: MascotaResponse
+    tieneCodigoCierre: bool = False
 
     class Config:
         from_attributes = True
@@ -40,6 +41,11 @@ class AlertasListResponse(BaseModel):
 class AlertaCreateResponse(BaseModel):
     success: bool = True
     alerta: AlertaResponse
+    codigoCierre: str
+
+
+class AlertaResolverBody(BaseModel):
+    codigoCierre: str
 
 
 class AlertaCreateForm(BaseModel):

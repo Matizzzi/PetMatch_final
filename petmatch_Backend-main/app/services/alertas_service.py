@@ -11,6 +11,7 @@ from app.models.alerta import AlertaPerdida
 from app.models.mascota import Mascota
 from app.models.usuario import Usuario
 from app.schemas.alerta import AlertaCreateForm
+from app.services.codigo_cierre import codigos_coinciden, generar_codigo_cierre, hashear_codigo
 from app.services.image_storage import procesar_y_optimizar_foto
 from app.services.matching import procesar_matches_para_alerta
 from app.services.text_utils import limpiar_opcional
@@ -45,14 +46,22 @@ def marcar_resuelta(db: Session, alerta: AlertaPerdida) -> AlertaPerdida:
     return alerta
 
 
+def verificar_codigo_cierre(alerta: AlertaPerdida, codigo: str) -> bool:
+    return codigos_coinciden(codigo, alerta.codigoCierreHash)
+
+
 def crear_alerta(
     db: Session,
     datos: AlertaCreateForm,
     foto: Optional[UploadFile],
     usuario: Optional[Usuario],
-) -> AlertaPerdida:
-    """Crea mascota + alerta en una transacción y calcula matches inmediatos."""
+) -> tuple[AlertaPerdida, str]:
+    """Crea mascota + alerta en una transacción y calcula matches inmediatos.
+
+    Devuelve el código de cierre en claro una sola vez; en base se guarda el hash.
+    """
     usuario = usuario or get_or_create_guest_user(db)
+    codigo_cierre = generar_codigo_cierre()
     foto_url = procesar_y_optimizar_foto(foto=foto, foto_url=datos.fotoUrl, prefijo="mascota")
 
     mascota = Mascota(
@@ -81,6 +90,7 @@ def crear_alerta(
         whatsapp=limpiar_opcional(datos.whatsapp),
         fechaPerdida=datetime.now(timezone.utc),
         activa=True,
+        codigoCierreHash=hashear_codigo(codigo_cierre),
     )
     db.add(alerta)
     db.commit()
@@ -92,7 +102,7 @@ def crear_alerta(
     except Exception as e:
         logger.warning(f"Aviso al procesar matches para alerta {alerta.id}: {e}")
 
-    return alerta
+    return alerta, codigo_cierre
 
 
 def actualizar_foto(

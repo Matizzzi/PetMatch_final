@@ -4,6 +4,7 @@ import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { Spacing } from "@/constants/theme";
 import { useAppTheme } from "@/contexts/theme-context";
+import { webSafeButtonRole } from "@/lib/web-a11y";
 import type { IoniconName } from "@/types/ui";
 
 /** Banner de error de validación o de red. */
@@ -51,7 +52,7 @@ export function ActionButton({
     <Pressable
       disabled={loading}
       onPress={onPress}
-      accessibilityRole="button"
+      accessibilityRole={webSafeButtonRole}
       accessibilityState={{ busy: loading, disabled: loading }}
       style={({ pressed }) => [
         styles.button,

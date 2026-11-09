@@ -1,3 +1,5 @@
+import { Platform } from "react-native";
+
 import { asegurarFotoUrlTexto, dataUrlABlob, esDataUrl } from "@/lib/image-encoding";
 import type {
   AnalisisIA,
@@ -35,11 +37,14 @@ function armarFormDataFoto(fotoUrl: string): FormData {
 
 /**
  * POST /api/ia/analizar.
- * En web se manda el archivo en `foto` (Starlette corta los Data URL de texto a 1 MB).
- * Si el multipart falla, se reintenta JSON `{ fotoUrl }`.
+ * En Android/iOS Hermes no soporta `new Blob([Uint8Array])`, así que se manda
+ * JSON `{ fotoUrl }` (el backend ya lo acepta). En web va multipart `foto`.
  */
 export async function analizarFoto(fotoUri: string): Promise<AnalisisIA> {
   const fotoUrl = await asegurarFotoUrlTexto(fotoUri);
+  if (Platform.OS !== "web") {
+    return pedirAnalisis({ fotoUrl });
+  }
   try {
     return await pedirAnalisis(armarFormDataFoto(fotoUrl));
   } catch (err) {

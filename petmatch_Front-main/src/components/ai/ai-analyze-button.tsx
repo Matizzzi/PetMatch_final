@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, StyleSheet, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { useAppTheme } from "@/contexts/theme-context";
+import { webSafeButtonRole } from "@/lib/web-a11y";
 
 interface AiAnalyzeButtonProps {
   analizando: boolean;
@@ -18,7 +19,7 @@ export function AiAnalyzeButton({ analizando, onPress }: AiAnalyzeButtonProps) {
       <Pressable
         onPress={onPress}
         disabled={analizando}
-        accessibilityRole="button"
+        accessibilityRole={webSafeButtonRole}
         accessibilityState={{ busy: analizando }}
         style={({ pressed }) => [
           styles.button,

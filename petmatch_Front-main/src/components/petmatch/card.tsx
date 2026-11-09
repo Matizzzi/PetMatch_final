@@ -3,6 +3,7 @@ import { Image } from "expo-image";
 import { Pressable, View } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { useAppTheme } from "@/contexts/theme-context";
+import { webSafeButtonRole } from "@/lib/web-a11y";
 import { AlertaPerdida } from "@/types/api";
 import { resolveFotoUrl } from "@/services/api";
 import { getCardStyles } from "./card.styles";
@@ -23,6 +24,7 @@ interface PetCardProps {
   onShare?: (alerta: AlertaPerdida) => void;
   onViewMatches?: (alerta: AlertaPerdida) => void;
   onGenerarAfiche?: (alerta: AlertaPerdida) => void;
+  onResolver?: (alerta: AlertaPerdida) => void;
 }
 
 export function PetCard({
@@ -32,6 +34,7 @@ export function PetCard({
   onShare,
   onViewMatches,
   onGenerarAfiche,
+  onResolver,
 }: PetCardProps) {
   const { colors } = useAppTheme();
   const styles = getCardStyles(colors, alerta.urgente);
@@ -175,6 +178,7 @@ export function PetCard({
         {onViewMatches && (
           <Pressable
             onPress={() => onViewMatches(alerta)}
+            hitSlop={8}
             style={({ pressed }) => [
               styles.btnMatches,
               { opacity: pressed ? 0.8 : 1 },
@@ -198,6 +202,20 @@ export function PetCard({
             <Ionicons name="megaphone-outline" size={14} color="#DC2626" />
             <ThemedText numberOfLines={1} style={styles.btnAficheText}>
               Afiche
+            </ThemedText>
+          </Pressable>
+        )}
+
+        {onResolver && alerta.activa && (
+          <Pressable
+            onPress={() => onResolver(alerta)}
+            accessibilityRole={webSafeButtonRole}
+            accessibilityLabel={`Marcar a ${mascota.nombre} como reencontrado`}
+            style={({ pressed }) => [styles.btnResolver, { opacity: pressed ? 0.8 : 1 }]}
+          >
+            <Ionicons name="home-outline" size={14} color="#065F46" />
+            <ThemedText numberOfLines={1} style={styles.btnResolverText}>
+              Ya volvió
             </ThemedText>
           </Pressable>
         )}

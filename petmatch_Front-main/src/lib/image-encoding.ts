@@ -1,3 +1,4 @@
+import { Platform } from "react-native";
 import type * as ImageManipulatorModule from "expo-image-manipulator";
 import type { ImagePickerAsset, ImagePickerOptions } from "expo-image-picker";
 
@@ -56,8 +57,11 @@ export function esFotoTexto(uri: string): boolean {
   return uri.startsWith("http://") || uri.startsWith("https://") || esDataUrl(uri);
 }
 
-/** Convierte un Data URL a Blob para enviarlo como archivo multipart (`foto`). */
+/** Convierte un Data URL a Blob para enviarlo como archivo multipart (`foto`). Solo web. */
 export function dataUrlABlob(dataUrl: string): Blob {
+  if (Platform.OS !== "web") {
+    throw new Error("En Android/iOS la foto se envía como Data URL, no como Blob.");
+  }
   const coma = dataUrl.indexOf(",");
   if (coma < 0) throw new Error("Data URL de imagen inválida.");
   const header = dataUrl.slice(0, coma);
@@ -70,6 +74,8 @@ export function dataUrlABlob(dataUrl: string): Blob {
 }
 
 async function uriADataUrlViaFetch(uri: string): Promise<string | null> {
+  // Hermes/Android: `response.blob()` internamente hace `new Blob([ArrayBuffer])` y crashea.
+  if (Platform.OS !== "web") return null;
   if (typeof fetch === "undefined" || typeof FileReader === "undefined") return null;
   try {
     const res = await fetch(uri);

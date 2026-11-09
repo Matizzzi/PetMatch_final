@@ -18,7 +18,7 @@ export function getHomeStyles(colors: ThemeColors) {
       width: "100%",
     },
     flatListContent: {
-      paddingBottom: 200,
+      paddingBottom: 280,
     },
     headerSection: {
       gap: Spacing.two,
@@ -103,6 +103,21 @@ export function getHomeStyles(colors: ThemeColors) {
       alignItems: "center",
       justifyContent: "center",
       backgroundColor: colors.backgroundSelected,
+    },
+    accountBtn: {
+      width: 34,
+      height: 34,
+      borderRadius: 17,
+      alignItems: "center",
+      justifyContent: "center",
+      backgroundColor: colors.tint + "18",
+      borderWidth: 1,
+      borderColor: colors.tint + "40",
+    },
+    accountInitial: {
+      fontSize: 14,
+      fontWeight: "800",
+      color: colors.tint,
     },
     searchWrap: {
       flexDirection: "row",

@@ -1,7 +1,7 @@
 /**
  * Validación y transformación de estados de formulario a DTOs de request.
  */
-import { COORDENADAS_DEFAULT } from "@/constants/petmatch";
+import { coordenadasDesdeTexto } from "@/lib/geo";
 import type { AlertaPerdida, Usuario } from "@/types/api";
 import type { AlertaFormValues, AvistamientoFormValues } from "@/types/forms";
 import type { CrearAlertaRequest, CrearAvistamientoRequest } from "@/types/requests";
@@ -21,7 +21,7 @@ export function validarAlerta(v: AlertaFormValues): string | null {
 
 export function aRequestDeAlerta(v: AlertaFormValues, fotoUri: string | null): CrearAlertaRequest {
   return {
-    ...COORDENADAS_DEFAULT,
+    ...coordenadasDesdeTexto(v.sector, v.nombreMascota),
     nombreMascota: v.nombreMascota.trim(),
     especie: v.especie,
     descripcion: v.descripcion.trim(),
@@ -94,7 +94,7 @@ export function aRequestDeAvistamiento(
     .join(" ");
 
   return {
-    ...COORDENADAS_DEFAULT,
+    ...coordenadasDesdeTexto(v.comuna, v.descripcion),
     especie: v.especie,
     descripcion,
     comuna: v.comuna.trim(),

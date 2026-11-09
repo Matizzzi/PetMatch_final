@@ -3,6 +3,7 @@ from typing import Any, Optional, Tuple
 from fastapi import APIRouter, HTTPException, Request, status
 from starlette.datastructures import UploadFile
 
+from app.core.rate_limit import limitar_ia
 from app.schemas.vision import CompararForenseRequest
 from app.services.image_loader import ImagenInvalidaError, cargar_bytes_imagen, leer_imagen_de_request
 from app.services.gemini_client import GeminiAuthError, GeminiError
@@ -63,6 +64,7 @@ async def analizar_mascota(request: Request):
     Analiza la fotografía de una mascota (Groq, Gemini o análisis local).
     Extrae especie, raza estimada, pelaje, tamaño, collar, señas y triaje.
     """
+    limitar_ia(request)
     try:
         foto, foto_url = await _foto_desde_request(request)
         image_bytes, mime_type = await leer_imagen_de_request(foto, foto_url)
@@ -96,10 +98,11 @@ async def analizar_mascota(request: Request):
 
 
 @router.post("/comparar-forense", status_code=status.HTTP_200_OK)
-async def comparar_forense(req_body: CompararForenseRequest):
+async def comparar_forense(request: Request, req_body: CompararForenseRequest):
     """
     Compara la mascota perdida con un avistamiento (marcas permanentes vs desgaste de calle).
     """
+    limitar_ia(request)
     try:
         bytes_mascota = cargar_bytes_imagen(req_body.fotoMascotaUrl)
     except Exception as e:

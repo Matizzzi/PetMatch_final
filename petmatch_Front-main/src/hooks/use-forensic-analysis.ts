@@ -27,11 +27,12 @@ export function useForensicAnalysis() {
           especie: alerta.mascota.especie,
         });
         setInformes((prev) => ({ ...prev, [matchId]: informe }));
-      } catch {
-        Alert.alert(
-          "Análisis Forense",
-          "No se pudo completar el análisis pericial con IA en este momento. Inténtalo nuevamente.",
-        );
+      } catch (err) {
+        const mensaje =
+          err instanceof Error && err.message
+            ? err.message
+            : "No se pudo completar el análisis pericial con IA en este momento. Inténtalo nuevamente.";
+        Alert.alert("Análisis Forense", mensaje);
       } finally {
         setCargando((prev) => ({ ...prev, [matchId]: false }));
       }

@@ -15,7 +15,7 @@ interface ScreenHeaderProps {
 /** Encabezado de pantalla de formulario con ícono destacado. */
 export function ScreenHeader({ icon, color, title, subtitle }: ScreenHeaderProps) {
   return (
-    <View style={styles.row} accessibilityRole="header">
+    <View style={styles.row}>
       <View style={[styles.badge, { backgroundColor: color + "15" }]}>
         <Ionicons name={icon} size={20} color={color} />
       </View>

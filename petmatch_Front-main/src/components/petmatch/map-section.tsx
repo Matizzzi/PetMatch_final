@@ -24,6 +24,8 @@ interface MapSectionProps {
     latitudeDelta: number;
     longitudeDelta: number;
   };
+  /** Android crashea si un Modal se abre encima del WebView: se desmonta el mapa. */
+  suspendido?: boolean;
 }
 
 export default function MapSection({
@@ -31,6 +33,7 @@ export default function MapSection({
   avistamientos = [],
   colors,
   initialRegion,
+  suspendido = false,
 }: MapSectionProps) {
   const lat = initialRegion?.latitude ?? -33.6869;
   const lng = initialRegion?.longitude ?? -71.2149;
@@ -48,6 +51,10 @@ export default function MapSection({
   const alertasConUbicacion = (alertas || []).filter(
     (a) => typeof a.latitud === "number" && typeof a.longitud === "number"
   );
+
+  if (suspendido) {
+    return <View style={[styles.mapContainer, { borderColor: colors.border, backgroundColor: colors.backgroundElement }]} />;
+  }
 
   if (!WebViewComponent) {
     const staticMapUrl = `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lng}&zoom=14&size=650x300&maptype=mapnik`;
@@ -108,13 +115,14 @@ export default function MapSection({
       <WebViewComponent
         originWhitelist={["*"]}
         source={{ html: mapHtml, baseUrl: "https://cdnjs.cloudflare.com" }}
+        key={`${alertas.length}-${avistamientos.length}`}
         style={styles.map}
         scrollEnabled={false}
         javaScriptEnabled={true}
         domStorageEnabled={true}
         mixedContentMode="always"
-        allowFileAccess={true}
-        allowUniversalAccessFromFileURLs={true}
+        nestedScrollEnabled
+        setSupportMultipleWindows={false}
       />
     </View>
   );

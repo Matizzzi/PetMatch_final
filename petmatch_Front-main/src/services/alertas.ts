@@ -22,3 +22,14 @@ export async function crearAlerta(
 export function obtenerAlerta(id: string): Promise<AlertaPerdida> {
   return apiRequest<AlertaPerdida>(`/api/alertas/${encodeURIComponent(id)}`);
 }
+
+/** PATCH /api/alertas/{id}/resolver — cierra con el código entregado al publicar. */
+export function resolverAlerta(
+  id: string,
+  codigoCierre: string,
+): Promise<{ success: boolean; mensaje: string; alerta: AlertaPerdida }> {
+  return apiRequest(`/api/alertas/${encodeURIComponent(id)}/resolver`, {
+    method: "PATCH",
+    body: { codigoCierre },
+  });
+}

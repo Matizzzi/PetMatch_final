@@ -1,3 +1,4 @@
+import { COORDENADAS_DEFAULT } from "@/constants/petmatch";
 import type { Coordenadas } from "@/types/requests";
 
 const RADIO_TIERRA_KM = 6371;
@@ -30,4 +31,21 @@ export function urlRutaGoogleMaps(origen: Coordenadas, destino: Coordenadas): st
     `&origin=${origen.latitud},${origen.longitud}` +
     `&destination=${destino.latitud},${destino.longitud}`
   );
+}
+
+/** Punto alrededor de Melipilla a partir del sector/nombre, para que cada reporte tenga pin propio. */
+export function coordenadasDesdeTexto(...partes: string[]): Coordenadas {
+  const seed = partes.map((p) => p.trim().toLowerCase()).filter(Boolean).join("|") || "melipilla";
+  let h = 2166136261;
+  for (let i = 0; i < seed.length; i += 1) {
+    h ^= seed.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  const n = h >>> 0;
+  const dLat = ((n % 1800) - 900) / 100_000;
+  const dLng = ((((n / 1800) | 0) % 1800) - 900) / 100_000;
+  return {
+    latitud: COORDENADAS_DEFAULT.latitud + dLat,
+    longitud: COORDENADAS_DEFAULT.longitud + dLng,
+  };
 }

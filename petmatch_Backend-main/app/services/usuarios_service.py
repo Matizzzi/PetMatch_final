@@ -7,6 +7,10 @@ from app.models.usuario import Usuario
 GUEST_EMAIL = "comunidad@petmatch.app"
 
 
+def es_usuario_invitado(usuario: Usuario | None) -> bool:
+    return bool(usuario and usuario.email == GUEST_EMAIL)
+
+
 def get_or_create_guest_user(db: Session) -> Usuario:
     """Usuario genérico al que se asocian las alertas publicadas sin sesión iniciada."""
     guest = db.query(Usuario).filter(Usuario.email == GUEST_EMAIL).first()

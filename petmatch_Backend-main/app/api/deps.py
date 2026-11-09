@@ -4,7 +4,9 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 from app.core.database import get_db
 from app.core.security import decode_access_token
+from app.models.alerta import AlertaPerdida
 from app.models.usuario import Usuario
+from app.services.usuarios_service import es_usuario_invitado
 
 security_scheme = HTTPBearer(auto_error=False)
 
@@ -59,3 +61,12 @@ def get_optional_current_user(
     if not usuario_id:
         return None
     return db.query(Usuario).filter(Usuario.id == usuario_id).first()
+
+
+def exigir_propietario_alerta(alerta: AlertaPerdida, usuario: Usuario) -> None:
+    """Solo el dueño con sesión real puede cerrar o cambiar la alerta."""
+    if es_usuario_invitado(usuario) or alerta.usuarioId != usuario.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Solo quien publicó esta alerta (con sesión iniciada) puede modificarla.",
+        )

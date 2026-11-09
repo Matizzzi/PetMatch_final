@@ -3,7 +3,9 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
+from app.api.deps import get_current_user
 from app.core.database import get_db
+from app.models.usuario import Usuario
 from app.schemas.match import MatchesListResponse
 from app.services import matches_service
 
@@ -32,6 +34,9 @@ def get_matches_for_alerta(alerta_id: str, db: Session = Depends(get_db)):
 
 
 @router.post("/recalcular-todos")
-def recalcular_todos_los_matches(db: Session = Depends(get_db)):
-    """Recorre todos los avistamientos y calcula sus matches."""
+def recalcular_todos_los_matches(
+    db: Session = Depends(get_db),
+    _usuario: Usuario = Depends(get_current_user),
+):
+    """Recorre todos los avistamientos y calcula sus matches. Requiere sesión."""
     return {"success": True, **matches_service.recalcular_todos(db)}

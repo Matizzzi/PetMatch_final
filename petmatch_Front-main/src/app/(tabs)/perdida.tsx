@@ -24,6 +24,7 @@ export default function PerdidaScreen() {
     return (
       <AlertaSuccessView
         alerta={form.alertaCreada}
+        codigoCierre={form.codigoCierre}
         onCrearOtra={form.reiniciar}
         onVerMapa={() => {
           form.reiniciar();
@@ -39,11 +40,7 @@ export default function PerdidaScreen() {
         icon="megaphone"
         color={colors.urgent}
         title="Se me perdió"
-        subtitle={
-          form.usuario
-            ? `Publicando como ${form.usuario.nombre}`
-            : "Alerta comunitaria inmediata (sin registro obligatorio)"
-        }
+        subtitle="Publica ahora, sin crear cuenta. Al terminar te damos un código para marcarla como reencontrada."
       />
 
       <EmergencyToggle

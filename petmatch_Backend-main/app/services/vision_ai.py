@@ -32,13 +32,13 @@ def analizar_imagen(image_bytes: bytes, mime_type: str = "image/jpeg") -> Dict[s
     if (settings.GROQ_API_KEY or "").strip():
         try:
             return normalizar_triaje(
-                generar_json_groq(PROMPT_ANALISIS, [image_bytes], timeout=45, etiqueta="ANALISIS")
+                generar_json_groq(PROMPT_ANALISIS, [image_bytes], timeout=12, etiqueta="ANALISIS")
             )
         except GroqError as e:
             logger.warning("Groq no disponible, se intenta Gemini: %s", e)
 
     try:
-        return normalizar_triaje(generar_json([PROMPT_ANALISIS, image_bytes], timeout=45, etiqueta="ANALISIS"))
+        return normalizar_triaje(generar_json([PROMPT_ANALISIS, image_bytes], timeout=12, etiqueta="ANALISIS"))
     except (GeminiAuthError, GeminiError) as e:
         logger.warning("Gemini no disponible, se usa análisis local: %s", e)
         return normalizar_triaje(analizar_imagen_local(image_bytes))
@@ -59,7 +59,7 @@ def comparar_biometria_forense(
             return generar_json_groq(
                 "\n".join([prompt, ETIQUETA_IMAGEN_MASCOTA, ETIQUETA_IMAGEN_AVISTAMIENTO]),
                 [foto_mascota_bytes, foto_avistamiento_bytes],
-                timeout=50,
+                timeout=12,
                 etiqueta="FORENSE",
             )
         except GroqError as e:
@@ -73,7 +73,7 @@ def comparar_biometria_forense(
         foto_avistamiento_bytes,
     ]
     try:
-        return generar_json(partes, timeout=45, etiqueta="FORENSE")
+        return generar_json(partes, timeout=12, etiqueta="FORENSE")
     except (GeminiAuthError, GeminiError) as e:
         logger.warning("Gemini no disponible para forense, se usa modo local: %s", e)
         return comparar_local()

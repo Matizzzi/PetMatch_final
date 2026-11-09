@@ -6,6 +6,7 @@ import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
+import { ClientOnly } from "@/components/client-only";
 import { AuthProvider } from "@/contexts/auth-context";
 import { AppThemeProvider, useAppTheme } from "@/contexts/theme-context";
 
@@ -17,6 +18,7 @@ function RootLayoutInner() {
     <ThemeProvider value={tema === "dark" ? DarkTheme : DefaultTheme}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="alerta/[id]" options={{ title: "Alerta · PetMatch" }} />
       </Stack>
     </ThemeProvider>
   );
@@ -46,7 +48,9 @@ export default function RootLayout() {
   return (
     <AppThemeProvider>
       <AuthProvider>
-        <RootLayoutInner />
+        <ClientOnly>
+          <RootLayoutInner />
+        </ClientOnly>
       </AuthProvider>
     </AppThemeProvider>
   );

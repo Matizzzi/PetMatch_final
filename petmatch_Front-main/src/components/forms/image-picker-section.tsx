@@ -4,6 +4,7 @@ import { Image, Pressable, StyleSheet, View } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { Spacing } from "@/constants/theme";
 import { useAppTheme } from "@/contexts/theme-context";
+import { webSafeButtonRole } from "@/lib/web-a11y";
 
 interface ImagePickerSectionProps {
   label: string;
@@ -34,7 +35,7 @@ export function ImagePickerSection({
           <Pressable
             onPress={onQuitar}
             style={styles.removeBtn}
-            accessibilityRole="button"
+            accessibilityRole={webSafeButtonRole}
             accessibilityLabel="Quitar foto"
           >
             <Ionicons name="trash-outline" size={16} color="#FFFFFF" />
@@ -44,7 +45,7 @@ export function ImagePickerSection({
       ) : (
         <Pressable
           onPress={onSeleccionar}
-          accessibilityRole="button"
+          accessibilityRole={webSafeButtonRole}
           style={[styles.placeholder, { borderColor: colors.tint, backgroundColor: colors.tint + "08" }]}
         >
           <Ionicons name="camera-outline" size={28} color={colors.tint} />

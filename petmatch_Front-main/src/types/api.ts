@@ -37,6 +37,7 @@ export interface AlertaPerdida {
   activa: boolean;
   createdAt: string;
   mascota: Mascota;
+  tieneCodigoCierre?: boolean;
 }
 
 export interface ReporteAvistamiento {
@@ -79,6 +80,7 @@ export interface MatchesResponse {
 export interface AlertaCreateResponse {
   success: boolean;
   alerta: AlertaPerdida;
+  codigoCierre: string;
 }
 
 export interface AvistamientoCreateResponse {

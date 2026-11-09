@@ -54,17 +54,33 @@ export function generateLeafletHtml(
       var data = ${payload};
       var center = (data && data.center && data.center.length === 2) ? data.center : [-33.6869, -71.2149];
       var map = L.map('map', { zoomControl: true }).setView(center, 13);
-      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}', {
         maxZoom: 19,
-        attribution: '© OpenStreetMap'
+        attribution: 'Tiles © Esri'
       }).addTo(map);
 
-      setTimeout(function() { map.invalidateSize(); }, 300);
-      setTimeout(function() { map.invalidateSize(); }, 1000);
+      function spread(points) {
+        var seen = {};
+        return (points || []).map(function(p) {
+          var k = Number(p.lat).toFixed(5) + ',' + Number(p.lng).toFixed(5);
+          var n = seen[k] || 0;
+          seen[k] = n + 1;
+          if (!n) return p;
+          var angle = n * 2.399;
+          var dist = 0.0014 * Math.ceil(n / 5);
+          return Object.assign({}, p, {
+            lat: p.lat + Math.cos(angle) * dist,
+            lng: p.lng + Math.sin(angle) * dist
+          });
+        });
+      }
+
+      setTimeout(function() { map.invalidateSize(); }, 200);
+      setTimeout(function() { map.invalidateSize(); }, 800);
       window.addEventListener('resize', function() { map.invalidateSize(); });
 
       // 1. Pines de Alertas de Pérdida (Rojos / Naranjas)
-      data.alertas.forEach(function(a) {
+      spread(data.alertas).forEach(function(a) {
         var color = a.urgente ? '#EF4444' : '#F97316';
         var marker = L.circleMarker([a.lat, a.lng], {
           radius: 9,
@@ -81,7 +97,7 @@ export function generateLeafletHtml(
       });
 
       // 2. Pines de Avistamientos Callejeros (Verdes)
-      data.avistamientos.forEach(function(av) {
+      spread(data.avistamientos).forEach(function(av) {
         var color = '#10B981';
         var marker = L.circleMarker([av.lat, av.lng], {
           radius: 8,

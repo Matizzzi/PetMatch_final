@@ -3,32 +3,32 @@ import { obtenerToken } from "./storage";
 
 const PRODUCTION_API_URL = "https://petmatch-backend-japt.onrender.com";
 
+function esHostLocal(host: string): boolean {
+  return (
+    host === "localhost" ||
+    host === "127.0.0.1" ||
+    /^(192\.168|10\.|172\.(1[6-9]|2[0-9]|3[0-1]))\./.test(host)
+  );
+}
+
 function resolveApiUrl(): string {
   const envUrl = process.env.EXPO_PUBLIC_API_URL?.trim();
 
-  if (Platform.OS === "web") {
-    if (typeof window !== "undefined") {
-      const host = window.location.hostname;
-      // Si corre en localhost o 127.0.0.1 en web
-      if (host === "localhost" || host === "127.0.0.1") {
-        return envUrl && !envUrl.includes("onrender.com") ? envUrl : "http://localhost:8000";
-      }
-      // Si corre en red local (ej. 192.168.x.x, 10.x.x.x, 172.x.x.x)
-      if (/^(192\.168|10\.|172\.(1[6-9]|2[0-9]|3[0-1]))/.test(host)) {
-        return `http://${host}:8000`;
-      }
+  if (Platform.OS === "web" && typeof window !== "undefined") {
+    const { hostname, origin, port } = window.location;
+    // Docker + Nginx (puerto 3000) o HTTP en 80: /api y /uploads ya van al backend.
+    if (port === "3000" || port === "80" || port === "") {
+      return origin;
+    }
+    // Expo web en dev (8081, 19006, …): el API escucha en :8000 de esa misma máquina.
+    if (esHostLocal(hostname)) {
+      return `http://${hostname}:8000`;
     }
     return envUrl || PRODUCTION_API_URL;
   }
 
-  if (envUrl) {
-    return envUrl;
-  }
-
-  return PRODUCTION_API_URL;
+  return envUrl || PRODUCTION_API_URL;
 }
-
-const API_URL = resolveApiUrl();
 
 export function resolveFotoUrl(url?: string | null): string | null {
   if (!url) return null;
@@ -69,7 +69,9 @@ interface RequestOptions {
   timeoutMs?: number;
 }
 
-const DEFAULT_TIMEOUT_MS = 45_000;
+const DEFAULT_TIMEOUT_MS = 60_000;
+const REINTENTOS_COLD_START = 2;
+const ESPERA_COLD_START_MS = 8_000;
 export const STATUS_SIN_CONEXION = 0;
 export const STATUS_TIMEOUT = 408;
 
@@ -114,6 +116,12 @@ function mensajeDelBackend(data: unknown, status: number): string {
   }
   if (typeof data === "string" && data.trim() && !data.trimStart().startsWith("<")) return data.trim();
   if (status === 413) return "La imagen es demasiado grande. Intenta con otra foto.";
+  if (status === 429) return "Hay demasiadas consultas en este momento. Espera un minuto e inténtalo de nuevo.";
+  if (status === 403) return "No tienes permiso para hacer eso.";
+  if (status === 401) return "Debes iniciar sesión para continuar.";
+  if (status === 502 || status === 503) {
+    return "El servidor está despertando. Espera unos segundos y vuelve a intentar.";
+  }
   if (status >= 500) return `El servidor tuvo un problema (HTTP ${status}). Intenta de nuevo en unos segundos.`;
   return `Ocurrió un error inesperado (HTTP ${status}).`;
 }
@@ -166,12 +174,24 @@ export async function apiRequest<T>(
 
   let response: Response;
   try {
-    response = await intentar(API_URL);
+    const apiUrl = resolveApiUrl();
+    response = await intentar(apiUrl);
   } catch (err) {
     // Solo ante falla de red (no timeout) se reintenta contra Render, p. ej. si el backend local está apagado.
     const sinConexion = err instanceof ApiRequestError && err.status === STATUS_SIN_CONEXION;
-    if (!sinConexion || API_URL === PRODUCTION_API_URL) throw err;
+    const apiUrl = resolveApiUrl();
+    if (!sinConexion || apiUrl === PRODUCTION_API_URL) throw err;
     response = await intentar(PRODUCTION_API_URL);
+  }
+
+  // Render free a veces responde 502/503 al despertar; GET y JSON se reintentan.
+  if (!esFormData(body)) {
+    let restantes = REINTENTOS_COLD_START;
+    while ((response.status === 502 || response.status === 503) && restantes > 0) {
+      restantes -= 1;
+      await new Promise((r) => setTimeout(r, ESPERA_COLD_START_MS));
+      response = await intentar(resolveApiUrl());
+    }
   }
 
   const texto = await response.text().catch(() => "");

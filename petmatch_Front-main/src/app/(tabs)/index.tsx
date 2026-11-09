@@ -2,10 +2,8 @@ import { Ionicons } from "@expo/vector-icons";
 import { useCallback, useMemo, useState } from "react";
 import {
   ActivityIndicator,
-  Alert,
   FlatList,
   Linking,
-  Platform,
   Pressable,
   RefreshControl,
   Share,
@@ -21,13 +19,16 @@ import { PetCard } from "@/components/petmatch/card";
 import { SightingCard } from "@/components/petmatch/sighting-card";
 import { MatchesModal } from "@/components/matches/matches-modal";
 import { PosterModal } from "@/components/petmatch/poster-modal";
+import { CodigoCierreModal } from "@/components/alerta/codigo-cierre-modal";
 import { ThemedText } from "@/components/themed-text";
 import { ThemedView } from "@/components/themed-view";
 import { useAppTheme } from "@/contexts/theme-context";
 import { useFocusEffect } from "expo-router";
+import { useCerrarAlerta } from "@/hooks/use-cerrar-alerta";
 import { apiRequest, ApiRequestError } from "@/services/api";
 import { AlertaPerdida, MatchesResponse, ReporteAvistamiento } from "@/types/api";
 import { getHomeStyles } from "@/components/petmatch/home.styles";
+import { obtenerCodigoCierre } from "@/lib/codigos-cierre";
 
 interface AlertasResponse {
   alertas: AlertaPerdida[];
@@ -113,6 +114,10 @@ export default function HomeScreen() {
     setRefrescando(true);
     cargarDatos();
   };
+
+  const cierre = useCerrarAlerta((actualizada) => {
+    setAlertas((prev) => prev.map((a) => (a.id === actualizada.id ? actualizada : a)));
+  });
 
   // Conteos para los chips
   const counts = useMemo(() => {
@@ -220,7 +225,7 @@ export default function HomeScreen() {
                     </View>
                   )}
 
-                  <Pressable onPress={toggleTema} style={styles.themeToggle}>
+                  <Pressable onPress={toggleTema} style={styles.themeToggle} accessibilityLabel="Cambiar tema">
                     <Ionicons
                       name={tema === "dark" ? "sunny" : "moon"}
                       size={16}
@@ -321,7 +326,7 @@ export default function HomeScreen() {
                 <View style={styles.loadingContainer}>
                   <ActivityIndicator size="small" color={colors.tint} />
                   <ThemedText type="small" themeColor="textSecondary">
-                    Cargando información comunitaria...
+                    Cargando alertas (el servidor puede tardar en despertar)...
                   </ThemedText>
                 </View>
               )}
@@ -338,27 +343,34 @@ export default function HomeScreen() {
                 onShare={compartirAlerta}
                 onViewMatches={setAlertaParaMatches}
                 onGenerarAfiche={setAlertaParaAfiche}
+                onResolver={
+                  (item as AlertaPerdida).activa &&
+                  ((item as AlertaPerdida).tieneCodigoCierre ||
+                    Boolean(obtenerCodigoCierre((item as AlertaPerdida).id)))
+                    ? cierre.pedirCierre
+                    : undefined
+                }
               />
             )
           }
           ListEmptyComponent={
             !cargando ? (
               <EmptyState
-                title={
+                    title={
                   error
-                    ? "Error al conectar con la API"
+                    ? "No pudimos cargar las alertas"
                     : busqueda
                     ? `Sin resultados para "${busqueda}"`
                     : esVistaAvistamientos
-                    ? "No hay avistamientos registrados"
-                    : "No hay mascotas en esta categoría"
+                    ? "Aún no hay avistamientos"
+                    : "No hay alertas en esta categoría"
                 }
                 message={
                   error
-                    ? `${error}. Asegúrate de que el backend esté ejecutándose en el puerto 8000.`
+                    ? "Revisa tu conexión e inténtalo de nuevo."
                     : esVistaAvistamientos
-                    ? "Sé el primero en reportar un animal visto en la calle usando la pestaña Reportar."
-                    : "Prueba seleccionando 'Perdidas' o buscando por otro nombre o sector."
+                    ? "Si viste un animal en la calle, publícalo en Avistó para ayudar a encontrarlo."
+                    : "Prueba otro filtro o busca por nombre o sector."
                 }
                 buttonText={error ? "Reintentar conexión" : "Ver todas las alertas"}
                 onReset={() => {
@@ -387,6 +399,15 @@ export default function HomeScreen() {
           alerta={alertaParaAfiche}
           visible={!!alertaParaAfiche}
           onClose={() => setAlertaParaAfiche(null)}
+        />
+
+        <CodigoCierreModal
+          visible={!!cierre.pendiente}
+          nombreMascota={cierre.pendiente?.mascota.nombre ?? ""}
+          enviando={cierre.enviando}
+          error={cierre.error}
+          onCancel={cierre.cancelar}
+          onConfirm={cierre.confirmarConCodigo}
         />
       </SafeAreaView>
     </ThemedView>

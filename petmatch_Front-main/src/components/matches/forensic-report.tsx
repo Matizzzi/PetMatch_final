@@ -3,6 +3,7 @@ import { ActivityIndicator, Pressable, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { useAppTheme } from "@/contexts/theme-context";
+import { webSafeButtonRole } from "@/lib/web-a11y";
 import { useThemedStyles } from "@/hooks/use-themed-styles";
 import { anchoBarra, colorRasgo, paletaVeredicto } from "@/lib/score-colors";
 import type { InformeForense } from "@/types/ai";
@@ -19,7 +20,7 @@ export function ForensicTrigger({ cargando, onPress }: ForensicTriggerProps) {
   const styles = useThemedStyles(getForensicReportStyles);
 
   return (
-    <Pressable style={styles.btnAnalisisForense} onPress={onPress} disabled={cargando} accessibilityRole="button">
+    <Pressable style={styles.btnAnalisisForense} onPress={onPress} disabled={cargando} accessibilityRole={webSafeButtonRole}>
       {cargando ? (
         <ActivityIndicator size="small" color={colors.tint} />
       ) : (
