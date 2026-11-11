@@ -68,7 +68,7 @@ export function MatchesModal({ alerta, visible, onClose }: MatchesModalProps) {
               <View style={styles.titleRow}>
                 <Ionicons name="sparkles" size={20} color={colors.tint} />
                 <ThemedText type="subtitle" style={styles.headerTitle}>
-                  Coincidencias (Matches)
+                  Posibles coincidencias
                 </ThemedText>
               </View>
               <ThemedText themeColor="textSecondary" type="small">

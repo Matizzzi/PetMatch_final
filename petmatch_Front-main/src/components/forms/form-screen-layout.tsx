@@ -36,6 +36,6 @@ const styles = StyleSheet.create({
   flex: { flex: 1 },
   content: {
     padding: Spacing.three,
-    paddingBottom: FloatingTabBarHeight + Spacing.six,
+    paddingBottom: FloatingTabBarHeight + Spacing.four,
   },
 });

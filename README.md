@@ -1,11 +1,11 @@
-# 🐾 PetMatch — Plataforma de Rescate y Búsqueda de Mascotas Perdidas
+# PetMatch — Plataforma de búsqueda de mascotas perdidas
 
 > **Proyecto de Título de Ingeniería de Software**  
 > Plataforma comunitaria para reportar mascotas perdidas y avistamientos, con geolocalización, matching heurístico e inteligencia artificial de visión.
 
 ---
 
-## 🚀 Inicio Rápido en Cualquier PC (100% Docker)
+## Inicio rápido (Docker)
 
 El proyecto está diseñado para funcionar en **cualquier computadora** (Windows, macOS, Linux) teniendo instalado únicamente **Docker Desktop**. No requiere instalar Node.js, Python ni PostgreSQL en la máquina host.
 
@@ -23,7 +23,7 @@ docker compose up -d --build
 
 ---
 
-## 🌐 Enlaces de Acceso Local
+## Acceso local
 
 Una vez iniciado Docker, los servicios estarán disponibles en:
 
@@ -37,7 +37,7 @@ Una vez iniciado Docker, los servicios estarán disponibles en:
 
 ---
 
-## 🏗️ Arquitectura del Sistema
+## Arquitectura
 
 ```text
 [ Cliente Web / Móvil ]
@@ -71,7 +71,7 @@ Una vez iniciado Docker, los servicios estarán disponibles en:
 
 ---
 
-## 🛠️ Comandos de Mantenimiento
+## Comandos
 
 - **Ver el estado de los contenedores:**
   ```bash
@@ -96,7 +96,7 @@ Una vez iniciado Docker, los servicios estarán disponibles en:
 
 ---
 
-## 🐾 Funcionalidades Principales
+## Funcionalidades
 
 1. **Exploración Georreferenciada**: Mapa interactivo con marcadores diferenciados de mascotas perdidas y avistamientos de animales callejeros (foco inicial: Melipilla, Chile).
 2. **Reporte de Pérdida con IA**: alertas con foto, señas y análisis morfológico automático (Groq o Gemini).

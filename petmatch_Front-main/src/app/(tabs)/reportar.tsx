@@ -20,8 +20,8 @@ export default function ReportarScreen() {
     return (
       <SuccessView
         icon="sparkles"
-        title="¡Avistamiento Reportado!"
-        message="Muchas gracias por colaborar. El motor de PetMatch acaba de comparar este avistamiento con las alertas activas de mascotas perdidas cercanas."
+        title="¡Gracias por reportar!"
+        message="Ya cruzamos este avistamiento con las alertas activas cerca de Melipilla."
       >
         <ActionButton
           icon="map-outline"
@@ -41,8 +41,8 @@ export default function ReportarScreen() {
       <ScreenHeader
         icon="eye"
         color={SemanticColors.warning}
-        title="Reportar Avistamiento"
-        subtitle="¿Viste a un perrito o gatito solo en la calle? Repórtalo para cruzar datos y avisar a su dueño."
+        title="Vi un animal"
+        subtitle="Publicá lo que viste. Lo cruzamos con las mascotas que se buscan cerca."
       />
 
       <AnimalSection values={values} setField={setField} fotoIA={form.fotoIA} />
@@ -52,7 +52,7 @@ export default function ReportarScreen() {
 
       <ActionButton
         icon="send"
-        label="Publicar Avistamiento y Buscar Match"
+        label="Publicar avistamiento"
         loading={form.enviando}
         onPress={form.enviar}
       />

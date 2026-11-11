@@ -5,8 +5,8 @@ import { SemanticColors } from "@/constants/petmatch";
 import type { ThemeColors } from "@/contexts/theme-context";
 
 export function colorScoreMatch(score: number, colors: ThemeColors): string {
-  if (score >= 80) return SemanticColors.success;
-  if (score >= 60) return SemanticColors.warning;
+  if (score >= 78) return SemanticColors.success;
+  if (score >= 62) return SemanticColors.warning;
   return colors.textSecondary;
 }
 

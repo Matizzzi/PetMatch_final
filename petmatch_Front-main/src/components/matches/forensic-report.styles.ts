@@ -20,7 +20,8 @@ export function getForensicReportStyles(colors: ThemeColors) {
       marginTop: 4,
     },
     btnAnalisisForenseText: {
-      fontSize: 12,
+      flexShrink: 1,
+      fontSize: 13,
       fontWeight: "700",
       color: colors.tint,
     },
@@ -34,14 +35,16 @@ export function getForensicReportStyles(colors: ThemeColors) {
       marginTop: 6,
     },
     forenseHeader: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
+      flexDirection: "column",
+      alignItems: "flex-start",
+      gap: 8,
     },
     forenseTitleWrap: {
       flexDirection: "row",
       alignItems: "center",
       gap: 6,
+      flex: 1,
+      minWidth: 0,
     },
     forenseTitle: {
       fontSize: 13,

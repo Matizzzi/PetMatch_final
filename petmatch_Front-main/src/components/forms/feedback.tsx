@@ -68,6 +68,7 @@ export function ActionButton({
       )}
       <ThemedText
         type={esPrimario ? "defaultSemiBold" : "smallBold"}
+        numberOfLines={1}
         style={{ color: esPrimario ? "#FFFFFF" : fondo }}
       >
         {loading && loadingLabel ? loadingLabel : label}
@@ -92,6 +93,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: Spacing.two,
     paddingVertical: 14,
+    paddingHorizontal: 16,
     borderRadius: 16,
   },
 });

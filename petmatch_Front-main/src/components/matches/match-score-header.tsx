@@ -22,14 +22,19 @@ export function MatchScoreHeader({ match, alerta, avistamiento }: MatchScoreHead
   const { colors } = useAppTheme();
   const styles = useThemedStyles(getMatchCardStyles);
   const scoreColor = colorScoreMatch(match.scoreTotal, colors);
+  const rasgosDebiles = match.scoreTexto < 35;
 
   return (
     <>
       <View style={styles.matchScoreBar}>
         <View style={[styles.scoreBadge, { backgroundColor: scoreColor + "20", borderColor: scoreColor }]}>
-          <Ionicons name="checkmark-circle" size={15} color={scoreColor} />
+          <Ionicons
+            name={rasgosDebiles ? "help-circle" : "checkmark-circle"}
+            size={15}
+            color={scoreColor}
+          />
           <ThemedText type="small" style={{ color: scoreColor, fontWeight: "800" }}>
-            {Math.round(match.scoreTotal)}% Coincidencia
+            {Math.round(match.scoreTotal)}% compatibilidad
           </ThemedText>
         </View>
         <ThemedText themeColor="textSecondary" type="small">
@@ -55,8 +60,17 @@ export function MatchScoreHeader({ match, alerta, avistamiento }: MatchScoreHead
           </ThemedText>
         </View>
         <View style={styles.metricItem}>
-          <Ionicons name="sparkles" size={13} color={SemanticColors.success} />
-          <ThemedText style={[styles.metricText, { color: SemanticColors.successText }]}>
+          <Ionicons
+            name="sparkles"
+            size={13}
+            color={rasgosDebiles ? colors.urgent : SemanticColors.success}
+          />
+          <ThemedText
+            style={[
+              styles.metricText,
+              { color: rasgosDebiles ? colors.urgent : SemanticColors.successText },
+            ]}
+          >
             Rasgos: {Math.round(match.scoreTexto)}%
           </ThemedText>
         </View>

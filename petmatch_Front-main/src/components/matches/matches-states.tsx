@@ -42,8 +42,8 @@ export function MatchesEmpty({ sector }: { sector?: string | null }) {
         Sin avistamientos coincidentes por ahora
       </ThemedText>
       <ThemedText themeColor="textSecondary" type="small" style={styles.emptyText}>
-        Cuando alguien reporte en la pestaña “Reportar” un animal con la misma especie y cerca de{" "}
-        {sector ?? "tu zona"}, aparecerá aquí de inmediato.
+        Cuando alguien reporte un animal de la misma especie, con rasgos parecidos y cerca de{" "}
+        {sector ?? "tu zona"}, aparece acá. Estar en la misma comuna no alcanza.
       </ThemedText>
     </View>
   );
@@ -58,11 +58,11 @@ export function MatchesSummary({ total }: { total: number }) {
       <Ionicons name="calculator-outline" size={20} color={colors.tint} />
       <View style={{ flex: 1, gap: 2 }}>
         <ThemedText style={styles.summaryTitle}>
-          {total} coincidencia(s) detectadas por el algoritmo
+          {total} posible(s) coincidencia(s) — no es reconocimiento facial
         </ThemedText>
         <ThemedText style={styles.summaryHint}>
-          Ponderación real: 55% Distancia (Fórmula de Haversine) + 25% Proximidad temporal + 20%
-          Rasgos clave.
+          60% rasgos de la descripción, 25% distancia y 15% momento. Pelajes distintos no entran.
+          Confirmá con el peritaje de fotos.
         </ThemedText>
       </View>
     </View>

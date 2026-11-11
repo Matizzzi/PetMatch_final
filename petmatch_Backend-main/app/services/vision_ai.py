@@ -59,7 +59,7 @@ def comparar_biometria_forense(
             return generar_json_groq(
                 "\n".join([prompt, ETIQUETA_IMAGEN_MASCOTA, ETIQUETA_IMAGEN_AVISTAMIENTO]),
                 [foto_mascota_bytes, foto_avistamiento_bytes],
-                timeout=12,
+                timeout=45,
                 etiqueta="FORENSE",
             )
         except GroqError as e:
@@ -76,7 +76,7 @@ def comparar_biometria_forense(
         return generar_json(partes, timeout=12, etiqueta="FORENSE")
     except (GeminiAuthError, GeminiError) as e:
         logger.warning("Gemini no disponible para forense, se usa modo local: %s", e)
-        return comparar_local()
+        return comparar_local(foto_mascota_bytes, foto_avistamiento_bytes)
     except Exception as e:
         logger.warning("Fallo inesperado de Gemini en forense, se usa modo local: %s", e)
-        return comparar_local()
+        return comparar_local(foto_mascota_bytes, foto_avistamiento_bytes)

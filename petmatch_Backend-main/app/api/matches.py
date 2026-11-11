@@ -15,7 +15,7 @@ router = APIRouter()
 @router.get("", response_model=MatchesListResponse)
 def list_matches(
     alertaId: Optional[str] = Query(None, description="Filtrar matches por ID de alerta"),
-    minScore: float = Query(50.0, description="Puntaje mínimo de match (0 a 100)"),
+    minScore: float = Query(62.0, description="Puntaje mínimo de match (0 a 100)"),
     limit: int = Query(50, le=100),
     db: Session = Depends(get_db),
 ):

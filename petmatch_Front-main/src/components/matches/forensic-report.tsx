@@ -27,18 +27,25 @@ export function ForensicTrigger({ cargando, onPress }: ForensicTriggerProps) {
         <Ionicons name="sparkles" size={15} color={colors.tint} />
       )}
       <ThemedText style={styles.btnAnalisisForenseText}>
-        {cargando
-          ? "Analizando biometría y rasgos de calle con IA..."
-          : "Ver Peritaje Biométrico con IA (Morfología y Calle)"}
+        {cargando ? "Comparando fotos (puede tardar un minuto)..." : "Comparar fotos con IA"}
       </ThemedText>
     </Pressable>
   );
 }
 
 /** Informe pericial: veredicto, resumen, rasgos, factores de calle y recomendación. */
-export function ForensicReport({ informe }: { informe: InformeForense }) {
+export function ForensicReport({
+  informe,
+  onReintentar,
+  reintentando,
+}: {
+  informe: InformeForense;
+  onReintentar?: () => void;
+  reintentando?: boolean;
+}) {
   const { colors } = useAppTheme();
   const styles = useThemedStyles(getForensicReportStyles);
+  const esLocal = informe.modeloUtilizado === "local";
   const paleta = paletaVeredicto(informe.veredicto, colors);
   const factores = informe.factoresCalle ?? [];
 
@@ -47,7 +54,9 @@ export function ForensicReport({ informe }: { informe: InformeForense }) {
       <View style={styles.forenseHeader}>
         <View style={styles.forenseTitleWrap}>
           <Ionicons name="finger-print-outline" size={18} color={colors.tint} />
-          <ThemedText style={styles.forenseTitle}>Peritaje Biométrico Forense</ThemedText>
+          <ThemedText style={styles.forenseTitle}>
+            {esLocal ? "Estimación local" : "Comparación de fotos"}
+          </ThemedText>
         </View>
         <View style={[styles.forenseBadge, { backgroundColor: paleta.fondo, borderColor: paleta.borde }]}>
           <ThemedText style={[styles.forenseBadgeText, { color: paleta.texto }]}>
@@ -96,10 +105,28 @@ export function ForensicReport({ informe }: { informe: InformeForense }) {
         <View style={styles.recomBox}>
           <Ionicons name="checkmark-circle-outline" size={16} color={colors.whatsapp} style={{ marginTop: 1 }} />
           <ThemedText style={styles.recomText}>
-            Recomendación Pericial: {informe.recomendacion}
+            {informe.recomendacion}
           </ThemedText>
         </View>
       )}
+
+      {esLocal && onReintentar ? (
+        <Pressable
+          style={styles.btnAnalisisForense}
+          onPress={onReintentar}
+          disabled={reintentando}
+          accessibilityRole={webSafeButtonRole}
+        >
+          {reintentando ? (
+            <ActivityIndicator size="small" color={colors.tint} />
+          ) : (
+            <Ionicons name="refresh" size={15} color={colors.tint} />
+          )}
+          <ThemedText style={styles.btnAnalisisForenseText}>
+            {reintentando ? "Esperando cupo de IA..." : "Reintentar con IA"}
+          </ThemedText>
+        </Pressable>
+      ) : null}
     </View>
   );
 }

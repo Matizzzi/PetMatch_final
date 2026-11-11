@@ -11,7 +11,7 @@ export const COORDENADAS_DEFAULT: Coordenadas = {
 export const SECTOR_DEFAULT = "Melipilla";
 
 /** Puntaje mínimo (0-100) para mostrar un match al dueño. */
-export const MIN_MATCH_SCORE = 40;
+export const MIN_MATCH_SCORE = 62;
 
 export const FOTO_MASCOTA_FALLBACK =
   "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=800";

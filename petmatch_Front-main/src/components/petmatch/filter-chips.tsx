@@ -1,21 +1,24 @@
+import { Ionicons } from "@expo/vector-icons";
 import { ScrollView, StyleSheet, Pressable, View } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { Spacing } from "@/constants/theme";
 import { useAppTheme } from "@/contexts/theme-context";
+import type { IoniconName } from "@/types/ui";
 
 export type FilterType = "todos" | "urgente" | "perro" | "gato" | "avistamientos";
 
 interface FilterOption {
   id: FilterType;
   label: string;
+  icon: IoniconName;
 }
 
 const OPTIONS: FilterOption[] = [
-  { id: "todos", label: "Perdidas" },
-  { id: "urgente", label: "Urgentes" },
-  { id: "perro", label: "Perros" },
-  { id: "gato", label: "Gatos" },
-  { id: "avistamientos", label: "Avistamientos" },
+  { id: "todos", label: "Perdidas", icon: "paw" },
+  { id: "urgente", label: "Urgentes", icon: "alert-circle" },
+  { id: "perro", label: "Perros", icon: "paw-outline" },
+  { id: "gato", label: "Gatos", icon: "logo-octocat" },
+  { id: "avistamientos", label: "Vistos", icon: "eye" },
 ];
 
 interface FilterChipsProps {
@@ -52,6 +55,11 @@ export function FilterChips({ selected, onSelect, counts }: FilterChipsProps) {
               },
             ]}
           >
+            <Ionicons
+              name={opt.icon}
+              size={14}
+              color={isSelected ? "#FFFFFF" : colors.tint}
+            />
             <ThemedText
               type="defaultSemiBold"
               style={[

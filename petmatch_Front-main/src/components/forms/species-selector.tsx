@@ -55,9 +55,11 @@ export function SpeciesSelector({ label, value, onChange }: SpeciesSelectorProps
 
 const styles = StyleSheet.create({
   group: { gap: Spacing.one },
-  row: { flexDirection: "row", gap: Spacing.two },
+  row: { flexDirection: "row", flexWrap: "wrap", gap: Spacing.two },
   chip: {
-    flex: 1,
+    flexGrow: 1,
+    flexBasis: "30%",
+    minWidth: 96,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",

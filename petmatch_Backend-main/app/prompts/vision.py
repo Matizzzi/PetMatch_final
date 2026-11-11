@@ -34,38 +34,43 @@ PROMPT_ANALISIS = (
 )
 
 PROMPT_FORENSE = (
-    "Eres un perito forense veterinario y experto en identificación biométrica de mascotas perdidas para la app PetMatch. "
+    "Eres un perito forense veterinario de identificación de mascotas para PetMatch. "
     "Se te presentan dos imágenes:\n"
-    "- IMAGEN 1: La mascota original reportada por su familia como perdida.\n"
-    "- IMAGEN 2: Un animal avistado en la calle por un testigo de la comunidad.\n\n"
-    "CRITERIO PERICIAL Y VETERINARIO CRÍTICO:\n"
-    "Un animal en situación de calle puede sufrir alteraciones físicas drásticas: pérdida notoria de peso y masa muscular, "
-    "pelaje apelmazado o manchado con barro/tierra, ojos entrecerrados por estrés, orejas gachas y postura encorvada. "
-    "Tu labor pericial es NO descartar por suciedad o delgadez. Concéntrate en la anatomía invariable: "
+    "- IMAGEN 1: La mascota original reportada como perdida.\n"
+    "- IMAGEN 2: Un animal avistado en la calle.\n\n"
+    "SÉ CONSERVADOR. Un falso positivo (decir que es el mismo animal cuando no lo es) es peor que un falso negativo.\n"
+    "La suciedad, el barro o la delgadez de calle NO confirman identidad. Tampoco las uses solas para descartar. "
+    "Si hay duda, baja el porcentaje. Nunca inventes coincidencias.\n\n"
+    "Anatomía que sí importa:\n"
     "1) Proporción craneal, hocico y separación interocular.\n"
     "2) Inserción, forma y porte de orejas.\n"
-    "3) Patrón base de pelaje y marcas corporales permanentes (manchas en pecho, patas, hocico o cola).\n\n"
+    "3) Color y patrón base de pelaje, más marcas permanentes (pecho, patas, hocico, cola).\n\n"
+    "REGLAS DE PUNTAJE:\n"
+    "- ALTA COINCIDENCIA (80-100): misma especie, mismo patrón de pelaje y al menos una marca distintiva coincidente.\n"
+    "- COINCIDENCIA MODERADA (45-79): misma especie y tamaño compatible, pero las marcas no se confirman o la foto es ambigua.\n"
+    "- BAJA COINCIDENCIA (0-44): color o patrón claramente distinto, hocico/orejas incompatibles, o no se puede afirmar que sea el mismo animal.\n"
+    "- Si el pelaje base es distinto (blanco vs negro, atigrado vs liso uniforme, naranja vs gris) el porcentaje NO puede superar 30 y el veredicto es BAJA COINCIDENCIA.\n\n"
     "Responde EXCLUSIVAMENTE un objeto JSON válido (sin formato markdown, sin bloques de código ```json) con los siguientes campos:\n"
     "{\n"
-    '  "porcentajeBiometrico": 88,\n'
+    '  "porcentajeBiometrico": 42,\n'
     '  "veredicto": "ALTA COINCIDENCIA" o "COINCIDENCIA MODERADA" o "BAJA COINCIDENCIA",\n'
     '  "nivelConfianza": "ALTO" o "MEDIO" o "BAJO",\n'
-    '  "resumenEjecutivo": "Explicación pericial clara de 2 o 3 oraciones dirigida al dueño, explicando por qué coincide o difiere considerando el estado de calle.",\n'
+    '  "resumenEjecutivo": "Explicación clara de 2 o 3 oraciones: por qué coincide o por qué NO es el mismo animal.",\n'
     '  "rasgosAnalizados": [\n'
     '    {\n'
     '      "nombre": "Estructura craneal y orejas",\n'
-    '      "porcentaje": 94,\n'
+    '      "porcentaje": 40,\n'
     '      "observacion": "Detalle anatómico observado..."\n'
     '    },\n'
     '    {\n'
     '      "nombre": "Patrón de manchas y pelaje",\n'
-    '      "porcentaje": 90,\n'
-    '      "observacion": "Concordancia de manchas..."\n'
+    '      "porcentaje": 28,\n'
+    '      "observacion": "Concordancia o conflicto de manchas..."\n'
     '    },\n'
     '    {\n'
     '      "nombre": "Proporción y tamaño corporal",\n'
-    '      "porcentaje": 82,\n'
-    '      "observacion": "Estructura compatible..."\n'
+    '      "porcentaje": 55,\n'
+    '      "observacion": "Estructura compatible o no..."\n'
     '    }\n'
     '  ],\n'
     '  "factoresCalle": [\n'

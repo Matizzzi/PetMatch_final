@@ -18,7 +18,7 @@ export function getHomeStyles(colors: ThemeColors) {
       width: "100%",
     },
     flatListContent: {
-      paddingBottom: 280,
+      paddingBottom: 168,
     },
     headerSection: {
       gap: Spacing.two,
@@ -146,6 +146,7 @@ export function getHomeStyles(colors: ThemeColors) {
     listTitleRow: {
       flexDirection: "row",
       alignItems: "center",
+      flexWrap: "wrap",
       marginHorizontal: Spacing.four,
       marginTop: Spacing.two,
       marginBottom: Spacing.one,
@@ -158,6 +159,7 @@ export function getHomeStyles(colors: ThemeColors) {
       backgroundColor: colors.tint,
     },
     sectionTitle: {
+      flexShrink: 1,
       fontSize: 15,
       fontWeight: "700",
       color: colors.text,

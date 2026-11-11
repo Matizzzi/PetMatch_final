@@ -19,9 +19,9 @@ const ICONS_INACTIVE: Record<string, keyof typeof Ionicons.glyphMap> = {
 };
 
 const LABELS: Record<string, string> = {
-  index: "Mapa",
-  perdida: "Alerta",
-  reportar: "Reportar",
+  index: "Inicio",
+  perdida: "Perdí",
+  reportar: "Vi uno",
 };
 
 export default function FloatingTabBar({ state, navigation }: any) {

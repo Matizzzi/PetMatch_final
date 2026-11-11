@@ -1,7 +1,9 @@
 import os
+import threading
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.staticfiles import StaticFiles
 from app.core.config import settings
 from app.core.database import Base, asegurar_esquema, engine
 import app.models
@@ -14,6 +16,31 @@ try:
 except Exception as e:
     print(f"Advertencia: No se pudieron sincronizar las tablas al inicio: {e}")
 
+
+def _recalcular_matches_en_segundo_plano() -> None:
+    """Reaplica el umbral nuevo sin bloquear el puerto 8000 (evita 502 de Nginx)."""
+    def _run() -> None:
+        from app.core.database import SessionLocal
+        from app.services.matches_service import recalcular_todos
+
+        db = SessionLocal()
+        try:
+            resultado = recalcular_todos(db)
+            print(f"Matches recalculados al inicio: {resultado}")
+        except Exception as e:
+            print(f"Advertencia: no se pudieron recalcular matches: {e}")
+        finally:
+            db.close()
+
+    threading.Thread(target=_run, daemon=True, name="recalc-matches").start()
+
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    _recalcular_matches_en_segundo_plano()
+    yield
+
+
 app = FastAPI(
     title="PetMatch API",
     description=(
@@ -23,6 +50,7 @@ app = FastAPI(
     version="1.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
+    lifespan=lifespan,
 )
 
 # Configuración de CORS amplia para desarrollo móvil y web

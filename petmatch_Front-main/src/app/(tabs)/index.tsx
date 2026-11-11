@@ -209,7 +209,7 @@ export default function HomeScreen() {
                     <View style={styles.locationPill}>
                       <Ionicons name="location-sharp" size={11} color={colors.tint} />
                       <ThemedText type="small" style={styles.locationLabel}>
-                        Melipilla, Chile
+                        Melipilla · sin cuenta
                       </ThemedText>
                     </View>
                   </View>
@@ -243,10 +243,10 @@ export default function HomeScreen() {
                   </View>
                   <View style={{ flex: 1 }}>
                     <ThemedText style={styles.securityTitle}>
-                      Consejo de Seguridad PetMatch
+                      Cuidado con estafas
                     </ThemedText>
                     <ThemedText style={styles.securityDesc}>
-                      Si alguien dice tener a tu mascota: nunca transfieras dinero ni des códigos SMS. Pide siempre una foto o videollamada actual y acuerda la entrega en lugares públicos.
+                      Nunca pagues por una mascota perdida. Pedí una foto reciente y reunite en un lugar público.
                     </ThemedText>
                   </View>
                   <Pressable
@@ -326,7 +326,7 @@ export default function HomeScreen() {
                 <View style={styles.loadingContainer}>
                   <ActivityIndicator size="small" color={colors.tint} />
                   <ThemedText type="small" themeColor="textSecondary">
-                    Cargando alertas (el servidor puede tardar en despertar)...
+                    Cargando alertas de Melipilla...
                   </ThemedText>
                 </View>
               )}
@@ -369,8 +369,8 @@ export default function HomeScreen() {
                   error
                     ? "Revisa tu conexión e inténtalo de nuevo."
                     : esVistaAvistamientos
-                    ? "Si viste un animal en la calle, publícalo en Avistó para ayudar a encontrarlo."
-                    : "Prueba otro filtro o busca por nombre o sector."
+                    ? "Si viste un animal en la calle, publicalo en Reportar."
+                    : "Probá otro filtro o buscá por nombre o sector."
                 }
                 buttonText={error ? "Reintentar conexión" : "Ver todas las alertas"}
                 onReset={() => {

@@ -42,7 +42,7 @@ export function AiAnalyzeButton({ analizando, onPress }: AiAnalyzeButtonProps) {
         </ThemedText>
       </Pressable>
       <ThemedText type="small" themeColor="textSecondary" style={styles.hint}>
-        Detecta pelaje y completa la descripción. Con Groq o Gemini también estima raza.
+        Completa pelaje, tamaño y señas a partir de la foto.
       </ThemedText>
     </View>
   );

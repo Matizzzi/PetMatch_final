@@ -34,7 +34,11 @@ export function MatchCard({
       <MatchScoreHeader match={match} alerta={alerta} avistamiento={avistamiento} />
       <PhotoComparison fotoMascota={alerta.mascota.fotoUrl} fotoAvistamiento={avistamiento.fotoUrl} />
       {informe ? (
-        <ForensicReport informe={informe} />
+        <ForensicReport
+          informe={informe}
+          onReintentar={informe.modeloUtilizado === "local" ? onSolicitarInforme : undefined}
+          reintentando={cargandoInforme}
+        />
       ) : (
         <ForensicTrigger cargando={cargandoInforme} onPress={onSolicitarInforme} />
       )}

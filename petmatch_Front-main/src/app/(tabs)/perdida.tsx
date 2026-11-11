@@ -40,7 +40,7 @@ export default function PerdidaScreen() {
         icon="megaphone"
         color={colors.urgent}
         title="Se me perdió"
-        subtitle="Publica ahora, sin crear cuenta. Al terminar te damos un código para marcarla como reencontrada."
+        subtitle="Publicá ahora, sin cuenta. Al final te damos un código para marcarla como reencontrada."
       />
 
       <EmergencyToggle
@@ -58,8 +58,8 @@ export default function PerdidaScreen() {
 
       <ActionButton
         icon="paper-plane-outline"
-        label="Publicar Alerta de Pérdida"
-        loadingLabel="Publicando alerta..."
+        label="Publicar alerta"
+        loadingLabel="Publicando..."
         loading={form.publicando}
         onPress={form.publicar}
       />

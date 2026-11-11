@@ -33,7 +33,7 @@ export function FormCard({ icon, title, children }: FormCardProps) {
 }
 
 const styles = StyleSheet.create({
-  card: { padding: Spacing.four, borderRadius: 20, borderWidth: 1, gap: Spacing.three },
-  header: { flexDirection: "row", alignItems: "center", gap: 8 },
-  title: { fontSize: 17, fontWeight: "700", marginBottom: Spacing.one },
+  card: { padding: Spacing.three, borderRadius: 20, borderWidth: 1, gap: Spacing.three },
+  header: { flexDirection: "row", alignItems: "center", gap: 8, flexWrap: "wrap" },
+  title: { flex: 1, fontSize: 16, fontWeight: "700" },
 });

@@ -74,7 +74,7 @@ export function SightingCard({ avistamiento }: SightingCardProps) {
 
         <View style={styles.infoCol}>
           <ThemedText type="subtitle" numberOfLines={1} style={styles.title}>
-            Avistamiento Callejero
+            {especieFormat} visto en la calle
           </ThemedText>
 
           <View style={styles.locationRow}>
@@ -114,7 +114,7 @@ export function SightingCard({ avistamiento }: SightingCardProps) {
         >
           <Ionicons name="logo-whatsapp" size={16} color="#FFFFFF" />
           <ThemedText style={styles.btnWhatsAppText}>
-            Contactar a testigo ({avistamiento.contactoTelefono})
+            Contactar testigo
           </ThemedText>
         </Pressable>
       )}

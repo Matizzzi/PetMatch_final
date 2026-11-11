@@ -44,8 +44,8 @@ export function AlertaSuccessView({
   return (
     <SuccessView
       icon="checkmark-circle"
-      title="¡Alerta Publicada!"
-      message={`La alerta de ${alerta.mascota.nombre} ya está activa. Quienes la vean podrán escribirte por WhatsApp.`}
+      title="¡Alerta publicada!"
+      message={`La de ${alerta.mascota.nombre} ya está visible. Quienes la vean pueden escribirte por WhatsApp.`}
     >
       {codigoCierre ? (
         <View style={[styles.codeCard, { borderColor: colors.border, backgroundColor: colors.backgroundSelected }]}>

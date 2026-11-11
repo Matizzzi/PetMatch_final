@@ -108,23 +108,50 @@ def analizar_imagen_local(image_bytes: bytes) -> Dict[str, Any]:
     }
 
 
-def comparar_local() -> Dict[str, Any]:
+def _pelaje_de_bytes(image_bytes: bytes) -> List[str]:
+    from PIL import Image
+
+    with Image.open(io.BytesIO(image_bytes)) as img:
+        return [nombre for nombre, _pct in _colores_dominantes(img.convert("RGB"))]
+
+
+def comparar_local(foto_mascota: bytes, foto_avistamiento: bytes) -> Dict[str, Any]:
+    """Estimación grosera por color de pelaje. No es biometría; el cupo de Groq se acabó."""
+    try:
+        c1, c2 = set(_pelaje_de_bytes(foto_mascota)), set(_pelaje_de_bytes(foto_avistamiento))
+    except Exception as e:
+        logger.warning("No se pudieron leer colores locales: %s", e)
+        c1, c2 = set(), set()
+
+    comunes = c1 & c2
+    if comunes:
+        porcentaje = min(62, 28 + 18 * len(comunes))
+        observacion = f"Colores en común: {', '.join(sorted(comunes))}."
+    elif c1 and c2:
+        porcentaje = 12
+        observacion = f"Pelajes distintos ({', '.join(sorted(c1))} vs {', '.join(sorted(c2))})."
+    else:
+        porcentaje = 0
+        observacion = "No se pudo leer el pelaje de las fotos."
+
+    veredicto = "COINCIDENCIA MODERADA" if porcentaje >= 45 else "BAJA COINCIDENCIA"
     return {
-        "porcentajeBiometrico": 50,
-        "veredicto": "COINCIDENCIA MODERADA",
+        "porcentajeBiometrico": porcentaje,
+        "veredicto": veredicto,
         "nivelConfianza": "BAJO",
         "resumenEjecutivo": (
-            "No hay un proveedor de visión en la nube configurado. "
-            "Compara las fotos de forma manual."
+            "La IA de fotos no respondió (cupo de Groq o Gemini). "
+            "Este porcentaje es solo una estimación por color de pelaje, no una comparación de cara. "
+            "Reintentá en un minuto."
         ),
         "rasgosAnalizados": [
             {
-                "nombre": "Análisis automático",
-                "porcentaje": 50,
-                "observacion": "Modo local: no hay comparación de marcas anatómicas.",
+                "nombre": "Color de pelaje (local)",
+                "porcentaje": porcentaje,
+                "observacion": observacion,
             }
         ],
         "factoresCalle": [],
-        "recomendacion": "Compara collar, manchas y hocico en persona.",
+        "recomendacion": "Esperá un minuto y tocá Reintentar con IA. No uses este porcentaje como prueba.",
         "modeloUtilizado": "local",
     }
