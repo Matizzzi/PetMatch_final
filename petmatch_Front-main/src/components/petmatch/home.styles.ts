@@ -63,9 +63,9 @@ export function getHomeStyles(colors: ThemeColors) {
       backgroundColor: colors.tint,
     },
     brandTitle: {
-      fontSize: 18,
-      fontWeight: "800",
-      letterSpacing: -0.3,
+      fontSize: 20,
+      lineHeight: 24,
+      letterSpacing: 0.2,
       color: colors.text,
     },
     locationPill: {

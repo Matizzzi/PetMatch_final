@@ -4,6 +4,7 @@ import { Linking, Pressable, View } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { useAppTheme } from "@/contexts/theme-context";
 import { ReporteAvistamiento } from "@/types/api";
+import { webClass, webDelay } from "@/lib/web-motion";
 import { resolveFotoUrl } from "@/services/api";
 import { getSightingCardStyles } from "./sighting-card.styles";
 
@@ -19,9 +20,10 @@ function tiempoRelativo(fechaISO: string): string {
 
 interface SightingCardProps {
   avistamiento: ReporteAvistamiento;
+  index?: number;
 }
 
-export function SightingCard({ avistamiento }: SightingCardProps) {
+export function SightingCard({ avistamiento, index = 0 }: SightingCardProps) {
   const { colors } = useAppTheme();
   const styles = getSightingCardStyles(colors);
 
@@ -39,7 +41,10 @@ export function SightingCard({ avistamiento }: SightingCardProps) {
   };
 
   return (
-    <View style={styles.card}>
+    <View
+      {...webClass("pet-card-interactive", "fade-in-slide")}
+      style={[styles.card, webDelay(index)]}
+    >
       <View style={styles.topRow}>
         <View style={styles.badgeRow}>
           <View style={styles.sightingPill}>

@@ -16,14 +16,12 @@ from app.prompts.vision import (
     PROMPT_ANALISIS,
     construir_prompt_forense,
 )
-from app.services.gemini_client import FALLBACK_MODELS, GeminiAuthError, GeminiError, generar_json
+from app.services.gemini_client import GeminiAuthError, GeminiError, generar_json
 from app.services.groq_client import GroqError, generar_json_groq
 from app.services.triage import normalizar_triaje
 from app.services.vision_local import analizar_imagen_local, comparar_local
 
 logger = logging.getLogger(__name__)
-
-__all__ = ["FALLBACK_MODELS", "analizar_imagen", "comparar_biometria_forense"]
 
 
 def analizar_imagen(image_bytes: bytes, mime_type: str = "image/jpeg") -> Dict[str, Any]:

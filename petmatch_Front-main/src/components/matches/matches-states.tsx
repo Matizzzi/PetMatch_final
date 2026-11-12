@@ -42,8 +42,8 @@ export function MatchesEmpty({ sector }: { sector?: string | null }) {
         Sin avistamientos coincidentes por ahora
       </ThemedText>
       <ThemedText themeColor="textSecondary" type="small" style={styles.emptyText}>
-        Cuando alguien reporte un animal de la misma especie, con rasgos parecidos y cerca de{" "}
-        {sector ?? "tu zona"}, aparece acá. Estar en la misma comuna no alcanza.
+        Cuando alguien reporte un animal de la misma especie cerca de{" "}
+        {sector ?? "tu zona"}, aparece acá. Confirmá con las fotos: el porcentaje no es reconocimiento facial.
       </ThemedText>
     </View>
   );
@@ -61,7 +61,7 @@ export function MatchesSummary({ total }: { total: number }) {
           {total} posible(s) coincidencia(s) — no es reconocimiento facial
         </ThemedText>
         <ThemedText style={styles.summaryHint}>
-          60% rasgos de la descripción, 25% distancia y 15% momento. Pelajes distintos no entran.
+          45% rasgos, 35% distancia y 20% momento. Pelajes opuestos no entran.
           Confirmá con el peritaje de fotos.
         </ThemedText>
       </View>

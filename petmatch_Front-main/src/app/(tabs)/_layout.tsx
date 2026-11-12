@@ -5,7 +5,10 @@ import FloatingTabBar from "@/components/floating-tab-bar";
 export default function TabsLayout() {
   return (
     <Tabs
-      screenOptions={{ headerShown: false }}
+      screenOptions={{
+        headerShown: false,
+        animation: "fade",
+      }}
       tabBar={(props) => <FloatingTabBar {...props} />}
     >
       <Tabs.Screen name="index" />

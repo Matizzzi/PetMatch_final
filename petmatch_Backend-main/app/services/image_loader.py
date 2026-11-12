@@ -12,7 +12,6 @@ from starlette.datastructures import UploadFile
 
 from app.core.config import settings
 
-DEFAULT_SAMPLE_IMAGE = "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=800&auto=format&fit=crop"
 USER_AGENT = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
@@ -106,13 +105,14 @@ def cargar_bytes_imagen(url: Optional[str]) -> bytes:
     Carga una imagen para el peritaje forense. Ante datos corruptos o archivos
     locales inexistentes recurre a una imagen de muestra para no bloquear el flujo.
     """
-    target = url.strip() if url else DEFAULT_SAMPLE_IMAGE
+    fallback = settings.IMAGE_FALLBACK_URL
+    target = url.strip() if url else fallback
 
     if _es_data_url(target):
         try:
             return _decodificar_data_url(target)[0]
         except Exception:
-            return cargar_bytes_imagen(DEFAULT_SAMPLE_IMAGE)
+            return cargar_bytes_imagen(fallback)
 
     local = _ruta_local(target)
     if os.path.exists(local):
@@ -123,15 +123,15 @@ def cargar_bytes_imagen(url: Optional[str]) -> bytes:
         "localhost" in target or "127.0.0.1" in target or not target.startswith("http")
     )
     if es_upload_local:
-        target = DEFAULT_SAMPLE_IMAGE
+        target = fallback
 
     try:
         return _descargar(target, timeout=15)[0]
     except Exception:
-        if target == DEFAULT_SAMPLE_IMAGE:
+        if target == fallback:
             raise
         try:
-            return _descargar(DEFAULT_SAMPLE_IMAGE, timeout=10)[0]
+            return _descargar(fallback, timeout=10)[0]
         except Exception:
             pass
         raise

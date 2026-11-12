@@ -23,6 +23,7 @@ function FotoColumna({ label, url }: { label: string; url?: string | null }) {
         source={{ uri: resolveFotoUrl(url) || FOTO_MASCOTA_FALLBACK }}
         style={styles.comparePhoto}
         contentFit="cover"
+        transition={400}
         accessibilityLabel={label}
       />
     </View>

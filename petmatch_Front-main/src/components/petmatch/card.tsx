@@ -5,6 +5,7 @@ import { ThemedText } from "@/components/themed-text";
 import { useAppTheme } from "@/contexts/theme-context";
 import { webSafeButtonRole } from "@/lib/web-a11y";
 import { AlertaPerdida } from "@/types/api";
+import { webClass, webDelay } from "@/lib/web-motion";
 import { resolveFotoUrl } from "@/services/api";
 import { getCardStyles } from "./card.styles";
 
@@ -19,6 +20,7 @@ function tiempoRelativo(fechaISO: string): string {
 
 interface PetCardProps {
   alerta: AlertaPerdida;
+  index?: number;
   matchesCount?: number;
   onWhatsApp?: (numero: string, nombre: string) => void;
   onShare?: (alerta: AlertaPerdida) => void;
@@ -29,6 +31,7 @@ interface PetCardProps {
 
 export function PetCard({
   alerta,
+  index = 0,
   matchesCount,
   onWhatsApp,
   onShare,
@@ -44,7 +47,10 @@ export function PetCard({
     mascota.especie.charAt(0).toUpperCase() + mascota.especie.slice(1).toLowerCase();
 
   return (
-    <View style={styles.card}>
+    <View
+      {...webClass("pet-card-interactive", "fade-in-slide")}
+      style={[styles.card, webDelay(index)]}
+    >
       {/* 1. Header con Badges */}
       <View style={styles.topRow}>
         <View style={styles.badgeRow}>

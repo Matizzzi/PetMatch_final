@@ -47,6 +47,14 @@ export const Fonts = Platform.select({
   },
 });
 
+/** Familias cargadas en RootLayout (expo-google-fonts). */
+export const Typefaces = {
+  display: "AlfaSlabOne_400Regular",
+  serif: "Lora_600SemiBold",
+  serifRegular: "Lora_400Regular",
+  stamp: "SpecialElite_400Regular",
+} as const;
+
 export const Spacing = {
   half: 2,
   one: 4,

@@ -4,6 +4,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ThemedView } from "@/components/themed-view";
 import { FloatingTabBarHeight, Spacing } from "@/constants/theme";
+import { webClass } from "@/lib/web-motion";
 
 interface FormScreenLayoutProps {
   children: ReactNode;
@@ -21,6 +22,7 @@ export function FormScreenLayout({ children, gap = Spacing.three }: FormScreenLa
           style={styles.flex}
         >
           <ScrollView
+            {...webClass("page-enter")}
             contentContainerStyle={[styles.content, { gap }]}
             showsVerticalScrollIndicator={false}
           >

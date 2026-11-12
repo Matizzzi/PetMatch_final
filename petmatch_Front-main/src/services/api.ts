@@ -1,5 +1,4 @@
 import { Platform } from "react-native";
-import { obtenerToken } from "./storage";
 
 const PRODUCTION_API_URL = "https://petmatch-backend-japt.onrender.com";
 
@@ -64,7 +63,6 @@ export class ApiRequestError extends Error {
 interface RequestOptions {
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   body?: FormData | Record<string, unknown>;
-  auth?: boolean; // si true, adjunta el token de sesión
   /** Tiempo máximo por intento. Render (plan gratuito) puede tardar ~50 s en despertar. */
   timeoutMs?: number;
 }
@@ -118,7 +116,7 @@ function mensajeDelBackend(data: unknown, status: number): string {
   if (status === 413) return "La imagen es demasiado grande. Intenta con otra foto.";
   if (status === 429) return "Hay demasiadas consultas en este momento. Espera un minuto e inténtalo de nuevo.";
   if (status === 403) return "No tienes permiso para hacer eso.";
-  if (status === 401) return "Debes iniciar sesión para continuar.";
+  if (status === 401) return "No autorizado.";
   if (status === 502 || status === 503) {
     return "El servidor está despertando. Espera unos segundos y vuelve a intentar.";
   }
@@ -130,7 +128,7 @@ export async function apiRequest<T>(
   path: string,
   options: RequestOptions = {},
 ): Promise<T> {
-  const { method = "GET", body, auth = false, timeoutMs = DEFAULT_TIMEOUT_MS } = options;
+  const { method = "GET", body, timeoutMs = DEFAULT_TIMEOUT_MS } = options;
 
   const headers: Record<string, string> = {
     "ngrok-skip-browser-warning": "true",
@@ -145,13 +143,6 @@ export async function apiRequest<T>(
   } else if (body) {
     headers["Content-Type"] = "application/json";
     requestBody = JSON.stringify(body);
-  }
-
-  if (auth) {
-    const token = await obtenerToken();
-    if (token) {
-      headers["Authorization"] = `Bearer ${token}`;
-    }
   }
 
   const init: RequestInit = { method, headers, body: requestBody };

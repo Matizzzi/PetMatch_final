@@ -72,5 +72,24 @@ button:active, [role="button"]:active {
 }
 
 .fade-in-slide {
-  animation: fadeInSlideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: fadeInSlideUp 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes tabIconPop {
+  from {
+    transform: scale(0.82);
+    opacity: 0.5;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.tab-icon-active {
+  animation: tabIconPop 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.page-enter {
+  animation: fadeInSlideUp 0.42s cubic-bezier(0.16, 1, 0.3, 1) both;
 }

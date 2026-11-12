@@ -16,18 +16,7 @@ from app.core.config import settings
 
 logger = logging.getLogger(__name__)
 
-GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
-
-# Orden de preferencia (nov 2026): si un modelo falla (cuota, 404, timeout) se prueba el siguiente.
-FALLBACK_MODELS = [
-    "gemini-3.8-flash",
-    "gemini-3.6-flash",
-    "gemini-3.5-flash-lite",
-    "gemini-flash-lite-latest",
-    "gemini-3.5-flash",
-    "gemini-flash-latest",
-    "gemini-3.1-flash-lite",
-]
+FALLBACK_MODELS = settings.gemini_models
 
 ParteContenido = Union[str, bytes]
 
@@ -68,7 +57,7 @@ def _construir_payload(partes: List[ParteContenido]) -> bytes:
     }).encode("utf-8")
 
 
-def _extraer_json(texto: str) -> Dict[str, Any]:
+def extraer_json(texto: str) -> Dict[str, Any]:
     """Parsea la respuesta del modelo tolerando delimitadores markdown (```json)."""
     texto = texto.strip()
     if texto.startswith("```"):
@@ -138,7 +127,7 @@ def generar_json(partes: List[ParteContenido], timeout: int = 30, etiqueta: str 
 
     for model_name in FALLBACK_MODELS:
         req = urllib.request.Request(
-            GEMINI_ENDPOINT.format(model=model_name),
+            settings.GEMINI_ENDPOINT.format(model=model_name),
             data=payload,
             headers={
                 "Content-Type": "application/json",
@@ -153,7 +142,7 @@ def generar_json(partes: List[ParteContenido], timeout: int = 30, etiqueta: str 
                 logger.warning(f"[{etiqueta}] {model_name} sin texto en la respuesta")
                 ultimo_error = "respuesta vacía"
                 continue
-            resultado = _extraer_json(texto)
+            resultado = extraer_json(texto)
             resultado["modeloUtilizado"] = model_name
             logger.info(f"[{etiqueta}] Respuesta exitosa con modelo {model_name}")
             return resultado

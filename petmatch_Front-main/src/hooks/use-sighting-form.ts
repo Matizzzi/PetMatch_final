@@ -1,25 +1,22 @@
 import { useCallback, useState } from "react";
 
 import { SECTOR_DEFAULT } from "@/constants/petmatch";
-import { useAuth } from "@/contexts/auth-context";
 import { camposDesdeAnalisis } from "@/lib/ai-autofill";
 import { mensajeDeError } from "@/lib/errors";
 import { aRequestDeAvistamiento, validarAvistamiento } from "@/lib/form-builders";
 import { crearAvistamiento } from "@/services/avistamientos";
 import type { AnalisisIA } from "@/types/ai";
-import type { Usuario } from "@/types/api";
 import type { AvistamientoFormValues } from "@/types/forms";
 import { useFormState } from "./use-form-state";
 import { usePhotoAnalysis } from "./use-photo-analysis";
 
-/** Los datos de contacto se precargan con los del usuario autenticado. */
-const crearValoresIniciales = (usuario: Usuario | null): AvistamientoFormValues => ({
+const crearValoresIniciales = (): AvistamientoFormValues => ({
   especie: "perro",
   descripcion: "",
   comuna: SECTOR_DEFAULT,
-  contactoNombre: usuario?.nombre ?? "",
+  contactoNombre: "",
   contactoTelefono: "",
-  contactoEmail: usuario?.email ?? "",
+  contactoEmail: "",
   urgente: false,
   condicionMedica: "",
 });
@@ -28,8 +25,7 @@ const crearValoresIniciales = (usuario: Usuario | null): AvistamientoFormValues 
  * Lógica del formulario "Reportar avistamiento": estado, IA, validación y envío.
  */
 export function useSightingForm() {
-  const { usuario } = useAuth();
-  const { values, setField, patch, reset } = useFormState(() => crearValoresIniciales(usuario));
+  const { values, setField, patch, reset } = useFormState(crearValoresIniciales);
 
   const [enviando, setEnviando] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -52,7 +48,7 @@ export function useSightingForm() {
 
     setEnviando(true);
     try {
-      await crearAvistamiento(aRequestDeAvistamiento(values, fotoIA.foto.fotoUri), !!usuario);
+      await crearAvistamiento(aRequestDeAvistamiento(values, fotoIA.foto.fotoUri));
       setExito(true);
     } catch (err) {
       setErrorMsg(
@@ -68,7 +64,7 @@ export function useSightingForm() {
   };
 
   const reiniciar = () => {
-    reset(crearValoresIniciales(usuario));
+    reset(crearValoresIniciales());
     fotoIA.reset();
     setErrorMsg(null);
     setExito(false);

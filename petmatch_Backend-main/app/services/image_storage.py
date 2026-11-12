@@ -3,7 +3,7 @@ import io
 import os
 import logging
 from datetime import datetime
-from typing import Optional, Tuple
+from typing import Optional
 from fastapi import UploadFile
 from PIL import Image
 from app.core.config import settings

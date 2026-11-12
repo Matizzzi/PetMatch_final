@@ -28,7 +28,9 @@ import { useCerrarAlerta } from "@/hooks/use-cerrar-alerta";
 import { apiRequest, ApiRequestError } from "@/services/api";
 import { AlertaPerdida, MatchesResponse, ReporteAvistamiento } from "@/types/api";
 import { getHomeStyles } from "@/components/petmatch/home.styles";
+import { COORDENADAS_DEFAULT } from "@/constants/petmatch";
 import { obtenerCodigoCierre } from "@/lib/codigos-cierre";
+import { webClass } from "@/lib/web-motion";
 
 interface AlertasResponse {
   alertas: AlertaPerdida[];
@@ -38,7 +40,10 @@ interface AvistamientosResponse {
   avistamientos: ReporteAvistamiento[];
 }
 
-const MELIPILLA = { latitude: -33.6869, longitude: -71.2149 };
+const REGION_DEFAULT = {
+  latitude: COORDENADAS_DEFAULT.latitud,
+  longitude: COORDENADAS_DEFAULT.longitud,
+};
 
 function abrirWhatsApp(numero: string, nombreMascota: string) {
   const limpio = numero.replace(/\D/g, "");
@@ -195,7 +200,7 @@ export default function HomeScreen() {
             />
           }
           ListHeaderComponent={
-            <View style={styles.headerSection}>
+            <View {...webClass("page-enter")} style={styles.headerSection}>
               {/* Top Bar Principal */}
               <View style={styles.headerBar}>
                 <View style={styles.headerLeft}>
@@ -203,7 +208,7 @@ export default function HomeScreen() {
                     <Ionicons name="paw" size={20} color="#FFFFFF" />
                   </View>
                   <View>
-                    <ThemedText type="subtitle" style={styles.brandTitle}>
+                    <ThemedText type="title" style={styles.brandTitle}>
                       PetMatch
                     </ThemedText>
                     <View style={styles.locationPill}>
@@ -298,7 +303,7 @@ export default function HomeScreen() {
                   avistamientos={avistamientos}
                   colors={colors}
                   initialRegion={{
-                    ...MELIPILLA,
+                    ...REGION_DEFAULT,
                     latitudeDelta: 0.08,
                     longitudeDelta: 0.08,
                   }}
@@ -332,11 +337,12 @@ export default function HomeScreen() {
               )}
             </View>
           }
-          renderItem={({ item }) =>
+          renderItem={({ item, index }) =>
             esVistaAvistamientos ? (
-              <SightingCard avistamiento={item as ReporteAvistamiento} />
+              <SightingCard index={index} avistamiento={item as ReporteAvistamiento} />
             ) : (
               <PetCard
+                index={index}
                 alerta={item as AlertaPerdida}
                 matchesCount={matchesPorAlerta[(item as AlertaPerdida).id]}
                 onWhatsApp={abrirWhatsApp}

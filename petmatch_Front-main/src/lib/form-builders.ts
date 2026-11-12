@@ -2,7 +2,7 @@
  * Validación y transformación de estados de formulario a DTOs de request.
  */
 import { coordenadasDesdeTexto } from "@/lib/geo";
-import type { AlertaPerdida, Usuario } from "@/types/api";
+import type { AlertaPerdida } from "@/types/api";
 import type { AlertaFormValues, AvistamientoFormValues } from "@/types/forms";
 import type { CrearAlertaRequest, CrearAvistamientoRequest } from "@/types/requests";
 
@@ -37,9 +37,9 @@ export function aRequestDeAlerta(v: AlertaFormValues, fotoUri: string | null): C
 }
 
 /** Alerta local para el afiche cuando el backend no devuelve la entidad creada. */
-export function alertaProvisional(req: CrearAlertaRequest, usuario: Usuario | null): AlertaPerdida {
+export function alertaProvisional(req: CrearAlertaRequest): AlertaPerdida {
   const ahora = new Date().toISOString();
-  const usuarioId = usuario?.id ?? "temp";
+  const usuarioId = "temp";
   return {
     id: `temp_${Date.now()}`,
     mascotaId: "temp",

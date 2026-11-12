@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, Pressable, View } from "react-native";
 import { ThemedText } from "@/components/themed-text";
 import { Spacing } from "@/constants/theme";
 import { useAppTheme } from "@/contexts/theme-context";
+import { pressScale } from "@/lib/web-motion";
 import type { IoniconName } from "@/types/ui";
 
 export type FilterType = "todos" | "urgente" | "perro" | "gato" | "avistamientos";
@@ -46,12 +47,12 @@ export function FilterChips({ selected, onSelect, counts }: FilterChipsProps) {
             onPress={() => onSelect(opt.id)}
             style={({ pressed }) => [
               styles.chip,
+              pressScale(pressed),
               {
                 backgroundColor: isSelected
                   ? colors.tint
                   : colors.backgroundElement,
                 borderColor: isSelected ? colors.tint : colors.border,
-                opacity: pressed ? 0.8 : 1,
               },
             ]}
           >

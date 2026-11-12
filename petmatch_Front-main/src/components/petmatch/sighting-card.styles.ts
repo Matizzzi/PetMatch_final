@@ -91,7 +91,8 @@ export function getSightingCardStyles(colors: ThemeColors) {
     },
     title: {
       fontSize: 16,
-      fontWeight: "800",
+      fontFamily: "Lora_600SemiBold",
+      fontWeight: "600",
       color: colors.text,
     },
     locationRow: {

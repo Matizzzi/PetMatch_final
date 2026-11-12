@@ -1,6 +1,7 @@
 import { View } from "react-native";
 
 import { useThemedStyles } from "@/hooks/use-themed-styles";
+import { webClass, webDelay } from "@/lib/web-motion";
 import type { InformeForense } from "@/types/ai";
 import type { AlertaPerdida, Match, ReporteAvistamiento } from "@/types/api";
 import { ForensicReport, ForensicTrigger } from "./forensic-report";
@@ -10,6 +11,7 @@ import { MatchScoreHeader } from "./match-score-header";
 import { PhotoComparison } from "./photo-comparison";
 
 interface MatchCardProps {
+  index?: number;
   match: Match;
   alerta: AlertaPerdida;
   avistamiento: ReporteAvistamiento;
@@ -20,6 +22,7 @@ interface MatchCardProps {
 
 /** Tarjeta de una coincidencia: compone puntaje, fotos, peritaje IA y contacto. */
 export function MatchCard({
+  index = 0,
   match,
   alerta,
   avistamiento,
@@ -30,7 +33,10 @@ export function MatchCard({
   const styles = useThemedStyles(getMatchCardStyles);
 
   return (
-    <View style={styles.matchCard}>
+    <View
+      {...webClass("pet-card-interactive", "fade-in-slide")}
+      style={[styles.matchCard, webDelay(index)]}
+    >
       <MatchScoreHeader match={match} alerta={alerta} avistamiento={avistamiento} />
       <PhotoComparison fotoMascota={alerta.mascota.fotoUrl} fotoAvistamiento={avistamiento.fotoUrl} />
       {informe ? (

@@ -1,6 +1,6 @@
 import { Platform, StyleSheet, Text, type TextProps } from "react-native";
 
-import { ThemeColor } from "@/constants/theme";
+import { ThemeColor, Typefaces } from "@/constants/theme";
 import { useTheme } from "@/hooks/use-theme";
 
 export type ThemedTextProps = TextProps & {
@@ -56,12 +56,22 @@ const styles = StyleSheet.create({
   smallBold: { fontSize: 13, lineHeight: 18, fontWeight: "600" },
   default: { fontSize: 16, lineHeight: 22 },
   defaultSemiBold: { fontSize: 16, lineHeight: 22, fontWeight: "600" },
-  title: { fontSize: 26, lineHeight: 32, fontWeight: "700" },
-  subtitle: { fontSize: 20, lineHeight: 26, fontWeight: "700" },
+  title: {
+    fontSize: 26,
+    lineHeight: 32,
+    fontFamily: Typefaces.display,
+    fontWeight: "400",
+  },
+  subtitle: {
+    fontSize: 20,
+    lineHeight: 26,
+    fontFamily: Typefaces.serif,
+    fontWeight: "600",
+  },
   link: { lineHeight: 26, fontSize: 14 },
   linkPrimary: { lineHeight: 26, fontSize: 14, color: "#3c87f7" },
   code: {
-    fontFamily: Platform.select({ ios: "Menlo", default: "monospace" }),
+    fontFamily: Typefaces.stamp,
     fontWeight: Platform.select({ android: "700" }) ?? "500",
     fontSize: 12,
   },

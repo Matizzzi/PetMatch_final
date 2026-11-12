@@ -7,7 +7,6 @@ import * as SplashScreen from "expo-splash-screen";
 import { useEffect } from "react";
 
 import { ClientOnly } from "@/components/client-only";
-import { AuthProvider } from "@/contexts/auth-context";
 import { AppThemeProvider, useAppTheme } from "@/contexts/theme-context";
 
 SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -16,9 +15,18 @@ function RootLayoutInner() {
   const { tema } = useAppTheme();
   return (
     <ThemeProvider value={tema === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack screenOptions={{ headerShown: false }}>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          animation: "fade",
+          animationDuration: 220,
+        }}
+      >
         <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="alerta/[id]" options={{ title: "Alerta · PetMatch" }} />
+        <Stack.Screen
+          name="alerta/[id]"
+          options={{ title: "Alerta · PetMatch", animation: "slide_from_right" }}
+        />
       </Stack>
     </ThemeProvider>
   );
@@ -47,11 +55,9 @@ export default function RootLayout() {
 
   return (
     <AppThemeProvider>
-      <AuthProvider>
-        <ClientOnly>
-          <RootLayoutInner />
-        </ClientOnly>
-      </AuthProvider>
+      <ClientOnly>
+        <RootLayoutInner />
+      </ClientOnly>
     </AppThemeProvider>
   );
 }

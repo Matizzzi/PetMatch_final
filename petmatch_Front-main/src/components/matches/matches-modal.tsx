@@ -1,5 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
-import { Modal, Pressable, ScrollView, View } from "react-native";
+import { Modal, Platform, Pressable, ScrollView, View } from "react-native";
 
 import { ThemedText } from "@/components/themed-text";
 import { useAppTheme } from "@/contexts/theme-context";
@@ -38,6 +38,7 @@ export function MatchesModal({ alerta, visible, onClose }: MatchesModalProps) {
           match.avistamiento ? (
             <MatchCard
               key={match.id}
+              index={matches.indexOf(match)}
               match={match}
               alerta={alerta}
               avistamiento={match.avistamiento}
@@ -54,7 +55,7 @@ export function MatchesModal({ alerta, visible, onClose }: MatchesModalProps) {
   return (
     <Modal
       visible={visible}
-      animationType="slide"
+      animationType={Platform.OS === "web" ? "fade" : "slide"}
       transparent
       statusBarTranslucent
       onRequestClose={onClose}

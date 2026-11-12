@@ -9,7 +9,6 @@ from sqlalchemy.orm import Session, joinedload
 from app.core.database import generate_id
 from app.models.alerta import AlertaPerdida
 from app.models.mascota import Mascota
-from app.models.usuario import Usuario
 from app.schemas.alerta import AlertaCreateForm
 from app.services.codigo_cierre import codigos_coinciden, generar_codigo_cierre, hashear_codigo
 from app.services.image_storage import procesar_y_optimizar_foto
@@ -54,13 +53,12 @@ def crear_alerta(
     db: Session,
     datos: AlertaCreateForm,
     foto: Optional[UploadFile],
-    usuario: Optional[Usuario],
 ) -> tuple[AlertaPerdida, str]:
     """Crea mascota + alerta en una transacción y calcula matches inmediatos.
 
     Devuelve el código de cierre en claro una sola vez; en base se guarda el hash.
     """
-    usuario = usuario or get_or_create_guest_user(db)
+    usuario = get_or_create_guest_user(db)
     codigo_cierre = generar_codigo_cierre()
     foto_url = procesar_y_optimizar_foto(foto=foto, foto_url=datos.fotoUrl, prefijo="mascota")
 
@@ -103,15 +101,3 @@ def crear_alerta(
         logger.warning(f"Aviso al procesar matches para alerta {alerta.id}: {e}")
 
     return alerta, codigo_cierre
-
-
-def actualizar_foto(
-    db: Session, alerta: AlertaPerdida, foto: Optional[UploadFile], foto_url: Optional[str]
-) -> Optional[str]:
-    """Reemplaza la foto de la mascota asociada y retorna la URL persistida."""
-    nueva = procesar_y_optimizar_foto(foto=foto, foto_url=foto_url, prefijo="mascota")
-    if nueva:
-        alerta.mascota.fotoUrl = nueva
-        db.commit()
-        db.refresh(alerta)
-    return alerta.mascota.fotoUrl

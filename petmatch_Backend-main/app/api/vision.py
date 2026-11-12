@@ -3,6 +3,7 @@ from typing import Any, Optional, Tuple
 from fastapi import APIRouter, HTTPException, Request, status
 from starlette.datastructures import UploadFile
 
+from app.core.config import settings
 from app.core.rate_limit import limitar_ia
 from app.schemas.vision import CompararForenseRequest
 from app.services.image_loader import ImagenInvalidaError, cargar_bytes_imagen, leer_imagen_de_request
@@ -12,9 +13,7 @@ from app.services.vision_ai import analizar_imagen, comparar_biometria_forense
 
 router = APIRouter()
 
-# Starlette limita cada parte multipart a 1 MB por defecto: un Data URL de
-# foto de celular lo supera y responde 400. 25 MB cubre JPEG redimensionados.
-MAX_PART_SIZE = 25 * 1024 * 1024
+# Starlette limita cada parte multipart a 1 MB por defecto; las fotos van en Data URL.
 
 
 def _es_upload(value: Any) -> bool:
@@ -26,7 +25,7 @@ def _es_upload(value: Any) -> bool:
 
 async def _formulario(request: Request):
     try:
-        return await request.form(max_part_size=MAX_PART_SIZE)
+        return await request.form(max_part_size=settings.IA_MAX_PART_BYTES)
     except TypeError:
         return await request.form()
 

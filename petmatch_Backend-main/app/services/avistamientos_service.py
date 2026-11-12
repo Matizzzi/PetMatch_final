@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from app.core.database import generate_id
 from app.models.avistamiento import ReporteAvistamiento
 from app.schemas.avistamiento import AvistamientoCreateForm
-from app.services.image_loader import DEFAULT_SAMPLE_IMAGE
+from app.core.config import settings
 from app.services.image_storage import procesar_y_optimizar_foto
 from app.services.matching import procesar_matches_para_avistamiento
 from app.services.text_utils import limpiar_opcional
@@ -28,17 +28,13 @@ def listar_recientes(db: Session) -> List[ReporteAvistamiento]:
     )
 
 
-def obtener_avistamiento(db: Session, avistamiento_id: str) -> Optional[ReporteAvistamiento]:
-    return db.query(ReporteAvistamiento).filter(ReporteAvistamiento.id == avistamiento_id).first()
-
-
 def crear_avistamiento(
     db: Session, datos: AvistamientoCreateForm, foto: Optional[UploadFile]
 ) -> ReporteAvistamiento:
     """Persiste el reporte y lo cruza de inmediato con las alertas activas."""
     foto_url = (
         procesar_y_optimizar_foto(foto=foto, foto_url=datos.fotoUrl, prefijo="avistamiento")
-        or DEFAULT_SAMPLE_IMAGE
+        or settings.IMAGE_FALLBACK_URL
     )
 
     reporte = ReporteAvistamiento(
@@ -65,14 +61,3 @@ def crear_avistamiento(
         logger.warning(f"Aviso al procesar matches para avistamiento {reporte.id}: {e}")
 
     return reporte
-
-
-def actualizar_foto(
-    db: Session, reporte: ReporteAvistamiento, foto: Optional[UploadFile], foto_url: Optional[str]
-) -> str:
-    nueva = procesar_y_optimizar_foto(foto=foto, foto_url=foto_url, prefijo="avistamiento")
-    if nueva:
-        reporte.fotoUrl = nueva
-        db.commit()
-        db.refresh(reporte)
-    return reporte.fotoUrl

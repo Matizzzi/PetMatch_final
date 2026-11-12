@@ -134,7 +134,8 @@ export function getCardStyles(colors: ThemeColors, isUrgent: boolean = false) {
     },
     petName: {
       fontSize: 18,
-      fontWeight: "800",
+      fontFamily: "Lora_600SemiBold",
+      fontWeight: "600",
       color: colors.text,
     },
     locationRow: {

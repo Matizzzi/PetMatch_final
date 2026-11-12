@@ -5,6 +5,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ThemedText } from "@/components/themed-text";
 import { Spacing } from "@/constants/theme";
 import { useAppTheme } from "@/contexts/theme-context";
+import { pressScale, webClass } from "@/lib/web-motion";
 
 const ICONS_ACTIVE: Record<string, keyof typeof Ionicons.glyphMap> = {
   index: "map",
@@ -70,8 +71,9 @@ export default function FloatingTabBar({ state, navigation }: any) {
             <Pressable
               key={route.key}
               onPress={onPress}
-              style={[
+              style={({ pressed }) => [
                 styles.item,
+                pressScale(pressed),
                 focused && [
                   styles.itemFocused,
                   { backgroundColor: colors.tint + "12" },
@@ -79,6 +81,7 @@ export default function FloatingTabBar({ state, navigation }: any) {
               ]}
             >
               <View
+                {...webClass(focused && "tab-icon-active")}
                 style={[
                   styles.iconWrap,
                   focused && {

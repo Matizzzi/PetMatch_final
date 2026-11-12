@@ -5,12 +5,6 @@
 
 export type Especie = "perro" | "gato" | "otro";
 
-export interface Usuario {
-  id: string;
-  nombre: string;
-  email: string;
-}
-
 export interface Mascota {
   id: string;
   nombre: string;
@@ -86,8 +80,4 @@ export interface AlertaCreateResponse {
 export interface AvistamientoCreateResponse {
   success: boolean;
   reporte: ReporteAvistamiento;
-}
-
-export interface ApiError {
-  error: string;
 }

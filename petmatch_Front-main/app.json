@@ -8,10 +8,7 @@
     "scheme": "petmatchmobile",
     "userInterfaceStyle": "light",
     "ios": {
-      "icon": "./assets/expo.icon",
-      "config": {
-        "googleMapsApiKey": "AIzaSyAAfgcgxs3m1ABWib_RQzirMJIBxnhFFC0"
-      }
+      "icon": "./assets/expo.icon"
     },
     "android": {
       "usesCleartextTraffic": true,
@@ -22,11 +19,6 @@
         "monochromeImage": "./assets/images/android-icon-monochrome.png"
       },
       "predictiveBackGestureEnabled": false,
-      "config": {
-        "googleMaps": {
-          "apiKey": "AIzaSyAAfgcgxs3m1ABWib_RQzirMJIBxnhFFC0"
-        }
-      },
       "package": "com.matizzzi.petmatchmobile"
     },
     "web": {

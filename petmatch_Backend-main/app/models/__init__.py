@@ -1,3 +1,5 @@
+"""Tablas SQLAlchemy. `import app.models` registra todo en Base.metadata."""
+
 from app.models.usuario import Usuario
 from app.models.mascota import Mascota
 from app.models.alerta import AlertaPerdida

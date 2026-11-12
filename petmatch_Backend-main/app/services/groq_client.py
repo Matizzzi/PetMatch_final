@@ -13,13 +13,10 @@ import urllib.request
 from typing import Any, Dict, List, Optional
 
 from app.core.config import settings
-from app.services.gemini_client import _extraer_json, comprimir_imagen_b64
+from app.services.gemini_client import comprimir_imagen_b64, extraer_json
 
 logger = logging.getLogger(__name__)
 
-GROQ_ENDPOINT = "https://api.groq.com/openai/v1/chat/completions"
-# qwen3.6-27b ya no existe (deprecado 2026-09). Solo este modelo tiene visión en el plan free.
-GROQ_MODELS = ("qwen/qwen3.8-27b",)
 _GROQ_LOCK = threading.Lock()
 
 
@@ -69,7 +66,7 @@ def _generar_json_groq_locked(
     contenido = [{"type": "text", "text": prompt}, *_partes_imagen(imagenes)]
     ultimo: Optional[str] = None
 
-    for modelo in GROQ_MODELS:
+    for modelo in settings.groq_models:
         payload = json.dumps({
             "model": modelo,
             "temperature": 0.2,
@@ -78,7 +75,7 @@ def _generar_json_groq_locked(
             "messages": [{"role": "user", "content": contenido}],
         }).encode("utf-8")
         req = urllib.request.Request(
-            GROQ_ENDPOINT,
+            settings.GROQ_ENDPOINT,
             data=payload,
             headers={
                 "Content-Type": "application/json",
@@ -101,7 +98,7 @@ def _generar_json_groq_locked(
                 if not str(texto).strip():
                     ultimo = "respuesta vacía"
                     break
-                resultado = _extraer_json(str(texto))
+                resultado = extraer_json(str(texto))
                 resultado["modeloUtilizado"] = modelo
                 logger.info("[%s] OK con %s", etiqueta, modelo)
                 return resultado

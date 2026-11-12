@@ -1,55 +1,49 @@
-# PetMatch Backend (FastAPI + Neon PostgreSQL + Docker) 🐾
+# PetMatch Backend
 
-Backend oficial para la plataforma **PetMatch**. Provee APIs REST para la aplicación móvil en **Expo (React Native)** y el cliente web.
+FastAPI + PostgreSQL (Neon). Sirve a la app Expo y al cliente web.
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Matizzzi/petmatch_Backend)
+## Estructura
 
----
+```
+app/
+  main.py          Punto de entrada: CORS, routers, /uploads, health
+  api/             Rutas HTTP (un archivo por recurso)
+  core/            Settings, DB, rate limit  ← nada de negocio acá
+  models/          Tablas SQLAlchemy
+  schemas/         Contratos Pydantic (request/response)
+  services/        Casos de uso (alertas, matching, visión, fotos)
+  prompts/         Textos de Groq/Gemini (separados de los clientes HTTP)
+uploads/           Copias locales de fotos (el origen de verdad va en Neon)
+```
 
-## 🚀 Cómo ejecutar el proyecto
+Valores que cambian por entorno (umbral de match, modelos de IA, CORS, claves)
+están en `app/core/config.py` y se pisan con `.env`. No hardcodear en los routers.
 
-### Opción 1: Con Docker (Recomendado para producción o despliegue)
+## Cómo correrlo
 
-Asegúrate de tener Docker instalado y ejecuta en la carpeta `backend/`:
+**Con el stack del repo** (recomendado): `docker compose up` en `PetMatch_final/`.
+
+**Solo este API:**
 
 ```bash
 docker compose up --build
 ```
 
-La API estará disponible en `http://localhost:8000`.
+O en local:
 
----
+```bash
+pip install -r requirements.txt
+uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+```
 
-### Opción 2: Localmente con Python
+Docs: [http://localhost:8000/docs](http://localhost:8000/docs)
 
-1. **Instalar dependencias:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+## Endpoints
 
-2. **Iniciar el servidor en modo desarrollo con auto-reload:**
-   ```bash
-   uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-   ```
-
----
-
-## 📖 Documentación Interactiva de la API (Swagger UI)
-
-Una vez iniciado el servidor, abre en tu navegador:
-- **Swagger UI:** [http://localhost:8000/docs](http://localhost:8000/docs)
-- **ReDoc:** [http://localhost:8000/redoc](http://localhost:8000/redoc)
-
-Desde Swagger puedes probar interactivamente todos los endpoints, autenticarte y revisar los esquemas de datos.
-
----
-
-## 🔌 Endpoints Principales
-
-- `POST /api/auth`: Login / Registro unificado con JWT.
-- `GET /api/me`: Consulta de perfil del usuario logueado (requiere Bearer Token).
-- `GET /api/alertas`: Listado de mascotas perdidas activas con sus datos y fotos.
-- `POST /api/alertas`: Publicación de una nueva alerta de mascota perdida con soporte para foto y geolocalización (requiere autenticación).
-- `GET /api/avistamientos`: Listado comunitario de avistamientos recientes.
-- `POST /api/avistamientos`: Reporte comunitario rápido de un animal visto en la calle (foto obligatoria).
-- `/uploads/{archivo}`: Servidor de archivos estáticos para las imágenes subidas.
+| Método | Ruta | Qué hace |
+|---|---|---|
+| GET/POST | `/api/alertas` | Pérdidas. El cierre es anónimo con `codigoCierre` |
+| GET/POST | `/api/avistamientos` | Reportes de calle |
+| GET | `/api/matches` | Coincidencias heurísticas |
+| POST | `/api/ia/analizar` | Visión (Groq → Gemini → local) |
+| POST | `/api/ia/comparar-forense` | Comparación de dos fotos |

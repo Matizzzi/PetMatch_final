@@ -35,5 +35,5 @@ const styles = StyleSheet.create({
   row: { flexDirection: "row", alignItems: "center", gap: Spacing.two, paddingVertical: Spacing.two },
   badge: { width: 44, height: 44, borderRadius: 22, alignItems: "center", justifyContent: "center" },
   texts: { flex: 1 },
-  title: { fontSize: 22, fontWeight: "800", flexShrink: 1 },
+  title: { fontSize: 22, flexShrink: 1 },
 });

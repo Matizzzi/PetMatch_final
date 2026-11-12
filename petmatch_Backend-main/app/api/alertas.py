@@ -1,12 +1,10 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import exigir_propietario_alerta, get_current_user, get_optional_current_user
 from app.api.forms import alerta_create_form
 from app.core.database import get_db
-from app.models.usuario import Usuario
 from app.schemas.alerta import (
     AlertaCreateForm,
     AlertaCreateResponse,
@@ -71,29 +69,8 @@ def marcar_alerta_resuelta(
 async def create_alerta(
     datos: AlertaCreateForm = Depends(alerta_create_form),
     foto: Optional[UploadFile] = File(None),
-    current_user: Optional[Usuario] = Depends(get_optional_current_user),
     db: Session = Depends(get_db),
 ):
     """Crea una alerta comunitaria. El código de cierre se entrega solo en esta respuesta."""
-    alerta, codigo_cierre = alertas_service.crear_alerta(db, datos, foto, current_user)
+    alerta, codigo_cierre = alertas_service.crear_alerta(db, datos, foto)
     return {"success": True, "alerta": alerta, "codigoCierre": codigo_cierre}
-
-
-@router.patch("/{alerta_id}/foto")
-async def actualizar_foto_alerta(
-    alerta_id: str,
-    foto: Optional[UploadFile] = File(None),
-    fotoUrl: Optional[str] = Form(None),
-    db: Session = Depends(get_db),
-    current_user: Usuario = Depends(get_current_user),
-):
-    """Actualiza la foto de una mascota perdida. Solo el dueño de la alerta."""
-    alerta = alertas_service.obtener_alerta(db, alerta_id)
-    if not alerta or not alerta.mascota:
-        raise HTTPException(status_code=404, detail="Alerta o mascota no encontrada")
-    exigir_propietario_alerta(alerta, current_user)
-    return {
-        "success": True,
-        "mensaje": "Foto de mascota actualizada y guardada en Neon PostgreSQL",
-        "fotoUrl": alertas_service.actualizar_foto(db, alerta, foto, fotoUrl),
-    }

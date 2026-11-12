@@ -5,6 +5,8 @@ from typing import Deque, DefaultDict
 
 from fastapi import HTTPException, Request, status
 
+from app.core.config import settings
+
 _ventanas: DefaultDict[str, Deque[float]] = defaultdict(deque)
 
 
@@ -32,7 +34,7 @@ def limitar(request: Request, max_hits: int, ventana_s: int, detalle: str) -> No
 def limitar_ia(request: Request) -> None:
     limitar(
         request,
-        max_hits=12,
-        ventana_s=300,
+        max_hits=settings.IA_RATE_MAX,
+        ventana_s=settings.IA_RATE_VENTANA_S,
         detalle="Demasiadas consultas de IA desde esta red. Espera unos minutos e inténtalo de nuevo.",
     )

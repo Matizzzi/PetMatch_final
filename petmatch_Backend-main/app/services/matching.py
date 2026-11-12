@@ -5,6 +5,7 @@ from typing import FrozenSet, Set, Tuple
 
 from sqlalchemy.orm import Session, joinedload
 
+from app.core.config import settings
 from app.core.database import generate_id
 from app.models.alerta import AlertaPerdida
 from app.models.avistamiento import ReporteAvistamiento
@@ -23,16 +24,16 @@ STOPWORDS = {
 
 # Pelajes que no pueden ser el mismo animal si cada ficha apunta a uno distinto.
 PALETAS_COLOR: Tuple[FrozenSet[str], ...] = (
-    frozenset({"blanco", "blanca", "blancos", "crema", "beige", "nieve"}),
-    frozenset({"negro", "negra", "negros", "oscuro", "oscura"}),
-    frozenset({"marron", "cafe", "canela", "chocolate", "pardo"}),
-    frozenset({"naranja", "anaranjado", "rufo", "dorado", "gold", "ginger"}),
-    frozenset({"gris", "plateado", "ceniza"}),
+    frozenset({"blanco", "blanca", "blancos", "blancas", "crema", "beige", "nieve"}),
+    frozenset({"negro", "negra", "negros", "negras", "oscuro", "oscura", "oscuros", "oscuras"}),
+    frozenset({"marron", "cafe", "canela", "chocolate", "pardo", "fawn"}),
+    frozenset({"naranja", "anaranjado", "rufo", "dorado", "dorada", "gold", "ginger"}),
+    frozenset({"gris", "grises", "plateado", "ceniza"}),
     frozenset({"atigrado", "rayado", "tabby"}),
 )
 
-# Zona y hora solas no alcanzan. Hay que tener rasgos compatibles.
-UMBRAL_MATCH = 62.0
+# Umbral y pesos salen de settings (se pueden cambiar por entorno sin tocar el algoritmo).
+UMBRAL_MATCH = settings.MATCH_UMBRAL
 
 
 def normalizar_texto(texto: str) -> Set[str]:
@@ -116,25 +117,38 @@ def calcular_score_texto(desc_alerta: str, desc_avistamiento: str) -> float:
     p2 = normalizar_texto(desc_avistamiento)
 
     if not p1 or not p2:
-        return 18.0
+        return 28.0
 
     pal1, pal2 = _paletas_en(p1), _paletas_en(p2)
-    if pal1 and pal2 and pal1.isdisjoint(pal2):
-        return 8.0
-
+    conflicto = bool(pal1 and pal2 and pal1.isdisjoint(pal2))
     comunes = p1.intersection(p2)
+
     if not comunes:
-        return 22.0
+        return 8.0 if conflicto else 28.0
 
     ratio = len(comunes) / min(len(p1), len(p2))
     extra = 14.0 if pal1 & pal2 else 0.0
-    return round(min(100.0, 28.0 + (ratio * 55.0) + extra), 1)
+    score = min(100.0, 28.0 + (ratio * 55.0) + extra)
+    if conflicto:
+        score = min(score, 26.0)
+    return round(score, 1)
+
+
+def _misma_zona(alerta: AlertaPerdida, avistamiento: ReporteAvistamiento) -> bool:
+    """Comuna/sector coinciden aunque el GPS tenga jitter."""
+    a = (alerta.comuna or alerta.sector or "").strip().lower()
+    b = (avistamiento.comuna or "").strip().lower()
+    if not a or not b:
+        return False
+    return a == b or a in b or b in a
 
 
 def calcular_match_scores(alerta: AlertaPerdida, avistamiento: ReporteAvistamiento) -> Tuple[float, float, float, float]:
     """Retorna (scoreDistancia, scoreTiempo, scoreTexto, scoreTotal)."""
     dist_km = calcular_distancia_km(alerta.latitud, alerta.longitud, avistamiento.latitud, avistamiento.longitud)
     s_dist = calcular_score_distancia(dist_km)
+    if _misma_zona(alerta, avistamiento):
+        s_dist = max(s_dist, 72.0)
     s_tiempo = calcular_score_tiempo(alerta.fechaPerdida, avistamiento.fechaAvistamiento)
 
     mascota = alerta.mascota
@@ -151,12 +165,17 @@ def calcular_match_scores(alerta: AlertaPerdida, avistamiento: ReporteAvistamien
     )
     s_texto = calcular_score_texto(texto_alerta, avistamiento.descripcion)
 
-    # Los rasgos pesan más que estar en la misma comuna el mismo día.
-    score_total = (s_dist * 0.25) + (s_tiempo * 0.15) + (s_texto * 0.60)
-    if s_texto < 35:
-        score_total = min(score_total, 52.0)
-    if s_texto <= 8:
-        score_total = min(score_total, 34.0)
+    score_total = (
+        (s_dist * settings.MATCH_PESO_DISTANCIA)
+        + (s_tiempo * settings.MATCH_PESO_TIEMPO)
+        + (s_texto * settings.MATCH_PESO_TEXTO)
+    )
+    if s_dist >= 40:
+        score_total = max(score_total, settings.MATCH_PISO_ZONA)
+        if s_texto <= 8:
+            score_total = min(score_total, settings.MATCH_TOPE_CONFLICTO_CERCA)
+    elif s_texto <= 8:
+        score_total = min(score_total, settings.MATCH_TOPE_CONFLICTO_LEJOS)
     return round(s_dist, 1), round(s_tiempo, 1), round(s_texto, 1), round(score_total, 1)
 
 
@@ -253,7 +272,7 @@ def procesar_matches_para_alerta(db: Session, alerta: AlertaPerdida) -> int:
     avistamientos = (
         db.query(ReporteAvistamiento)
         .order_by(ReporteAvistamiento.createdAt.desc())
-        .limit(50)
+        .limit(settings.MATCH_LIMITE_AVISTAMIENTOS)
         .all()
     )
 

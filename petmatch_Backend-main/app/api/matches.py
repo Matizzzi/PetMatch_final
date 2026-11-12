@@ -3,9 +3,8 @@ from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user
+from app.core.config import settings
 from app.core.database import get_db
-from app.models.usuario import Usuario
 from app.schemas.match import MatchesListResponse
 from app.services import matches_service
 
@@ -15,7 +14,7 @@ router = APIRouter()
 @router.get("", response_model=MatchesListResponse)
 def list_matches(
     alertaId: Optional[str] = Query(None, description="Filtrar matches por ID de alerta"),
-    minScore: float = Query(62.0, description="Puntaje mínimo de match (0 a 100)"),
+    minScore: float = Query(settings.MATCH_UMBRAL, description="Puntaje mínimo de match (0 a 100)"),
     limit: int = Query(50, le=100),
     db: Session = Depends(get_db),
 ):
@@ -31,12 +30,3 @@ def get_matches_for_alerta(alerta_id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Alerta no encontrada")
     matches = matches_service.matches_de_alerta(db, alerta_id)
     return {"total": len(matches), "matches": matches}
-
-
-@router.post("/recalcular-todos")
-def recalcular_todos_los_matches(
-    db: Session = Depends(get_db),
-    _usuario: Usuario = Depends(get_current_user),
-):
-    """Recorre todos los avistamientos y calcula sus matches. Requiere sesión."""
-    return {"success": True, **matches_service.recalcular_todos(db)}

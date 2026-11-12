@@ -63,8 +63,8 @@ export function useAlertForm() {
     setPublicando(true);
     try {
       const request = aRequestDeAlerta(values, fotoIA.foto.fotoUri);
-      const res = await crearAlerta(request, false);
-      const alerta = res?.alerta ?? alertaProvisional(request, null);
+      const res = await crearAlerta(request);
+      const alerta = res?.alerta ?? alertaProvisional(request);
       setAlertaCreada(alerta);
       if (res?.codigoCierre) {
         setCodigoCierre(res.codigoCierre);
