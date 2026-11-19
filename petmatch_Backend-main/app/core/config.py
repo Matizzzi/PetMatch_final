@@ -38,6 +38,7 @@ class Settings(BaseSettings):
     )
     GEMINI_ENDPOINT: str = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
 
+    # "*" para demo (Expo web + LAN). En Render se puede fijar orígenes separados por coma.
     CORS_ORIGINS: str = "*"
     IMAGE_FALLBACK_URL: str = (
         "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=800&auto=format&fit=crop"
@@ -55,9 +56,19 @@ class Settings(BaseSettings):
     MATCH_TOPE_CONFLICTO_CERCA: float = 54.0
     MATCH_TOPE_CONFLICTO_LEJOS: float = 34.0
 
-    IA_RATE_MAX: int = 12
-    IA_RATE_VENTANA_S: int = 300
+    IA_RATE_MAX: int = 8
+    IA_RATE_VENTANA_S: int = 600
+    IA_DIA_MAX: int = 25
+    IA_DIA_VENTANA_S: int = 86400
     IA_MAX_PART_BYTES: int = 25 * 1024 * 1024
+
+    PUBLICAR_RATE_MAX: int = 20
+    PUBLICAR_RATE_VENTANA_S: int = 300
+    CIERRE_RATE_MAX: int = 10
+    CIERRE_RATE_VENTANA_S: int = 300
+
+    FOTO_MAX_BYTES: int = 5 * 1024 * 1024
+    FOTO_MAX_PIXELS: int = 20_000_000
 
     @property
     def UPLOAD_DIR(self) -> str:
@@ -73,6 +84,11 @@ class Settings(BaseSettings):
         if raw == "*":
             return ["*"]
         return [origen.strip() for origen in raw.split(",") if origen.strip()]
+
+    @property
+    def cors_allow_credentials(self) -> bool:
+        # browsers rechazan Access-Control-Allow-Origin: * junto con credentials.
+        return self.cors_origins != ["*"]
 
     @property
     def groq_models(self) -> tuple[str, ...]:

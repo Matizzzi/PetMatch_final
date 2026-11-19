@@ -49,3 +49,7 @@ example
 /android
 
 .vercel
+
+# fotos subidas en local (pueden ser datos reales de prueba)
+petmatch_Backend-main/uploads/*
+!petmatch_Backend-main/uploads/.gitkeep

@@ -9,6 +9,7 @@ from fastapi.responses import FileResponse, RedirectResponse
 from app.api import alertas, avistamientos, matches, vision
 from app.core.config import settings
 from app.core.database import Base, SessionLocal, asegurar_esquema, engine
+from app.core import foto_segura  # noqa: F401  — tope de píxeles Pillow al arrancar
 import app.models  # noqa: F401  — registra las tablas en Base.metadata
 
 def _recalcular_matches_en_segundo_plano() -> None:
@@ -56,8 +57,8 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
-    allow_credentials=True,
-    allow_methods=["*"],
+    allow_credentials=settings.cors_allow_credentials,
+    allow_methods=["GET", "POST", "PATCH", "OPTIONS"],
     allow_headers=["*"],
 )
 

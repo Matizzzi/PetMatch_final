@@ -19,6 +19,7 @@ from app.prompts.vision import (
 from app.services.gemini_client import GeminiAuthError, GeminiError, generar_json
 from app.services.groq_client import GroqError, generar_json_groq
 from app.services.triage import normalizar_triaje
+from app.services.vision_gate import aplicar_gate
 from app.services.vision_local import analizar_imagen_local, comparar_local
 
 logger = logging.getLogger(__name__)
@@ -27,22 +28,24 @@ logger = logging.getLogger(__name__)
 def analizar_imagen(image_bytes: bytes, mime_type: str = "image/jpeg") -> Dict[str, Any]:
     """Especie, raza, pelaje, tamaño, collar, señas y triaje veterinario."""
     del mime_type
+    crudo: Optional[Dict[str, Any]] = None
     if (settings.GROQ_API_KEY or "").strip():
         try:
-            return normalizar_triaje(
-                generar_json_groq(PROMPT_ANALISIS, [image_bytes], timeout=12, etiqueta="ANALISIS")
-            )
+            crudo = generar_json_groq(PROMPT_ANALISIS, [image_bytes], timeout=12, etiqueta="ANALISIS")
         except GroqError as e:
             logger.warning("Groq no disponible, se intenta Gemini: %s", e)
 
-    try:
-        return normalizar_triaje(generar_json([PROMPT_ANALISIS, image_bytes], timeout=12, etiqueta="ANALISIS"))
-    except (GeminiAuthError, GeminiError) as e:
-        logger.warning("Gemini no disponible, se usa análisis local: %s", e)
-        return normalizar_triaje(analizar_imagen_local(image_bytes))
-    except Exception as e:
-        logger.warning("Fallo inesperado de visión, se usa análisis local: %s", e)
-        return normalizar_triaje(analizar_imagen_local(image_bytes))
+    if crudo is None:
+        try:
+            crudo = generar_json([PROMPT_ANALISIS, image_bytes], timeout=12, etiqueta="ANALISIS")
+        except (GeminiAuthError, GeminiError) as e:
+            logger.warning("Gemini no disponible, se usa análisis local: %s", e)
+            crudo = analizar_imagen_local(image_bytes)
+        except Exception as e:
+            logger.warning("Fallo inesperado de visión, se usa análisis local: %s", e)
+            crudo = analizar_imagen_local(image_bytes)
+
+    return aplicar_gate(normalizar_triaje(crudo))
 
 
 def comparar_biometria_forense(

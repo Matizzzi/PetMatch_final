@@ -54,6 +54,12 @@ export function AiAnalysisSummary({ analisis }: { analisis: AnalisisIA }) {
         )}
       </View>
 
+      {analisis.avisoVariosAnimales ? (
+        <ThemedText type="small" style={styles.aviso}>
+          {analisis.avisoVariosAnimales}
+        </ThemedText>
+      ) : null}
+
       <ThemedText type="small" themeColor="textSecondary">
         Los campos del formulario se completaron automáticamente. Puedes editarlos si lo necesitas.
       </ThemedText>
@@ -70,4 +76,5 @@ const styles = StyleSheet.create({
   rowTop: { flexDirection: "row", alignItems: "flex-start", gap: 6, marginTop: 2 },
   iconTop: { marginTop: 2 },
   italic: { flex: 1, fontStyle: "italic" },
+  aviso: { fontWeight: "600", marginTop: 4 },
 });

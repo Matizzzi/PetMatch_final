@@ -29,6 +29,10 @@ export interface AnalisisIA extends TriajeIA {
   senasParticulares?: string;
   descripcionSugerida?: string;
   modeloUtilizado?: string;
+  esFotoValida?: boolean;
+  cantidadAnimales?: number;
+  /** Si la foto tiene más de un animal, se analizó solo el principal. */
+  avisoVariosAnimales?: string | null;
 }
 
 export interface AnalisisIAResponse {

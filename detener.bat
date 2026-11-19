@@ -1,9 +1,7 @@
 @echo off
-title PetMatch - Detener Plataforma
-echo ========================================================
-echo        DETENIENDO PETMATCH
-echo ========================================================
+title PetMatch - Detener
+cd /d "%~dp0"
+echo Deteniendo contenedores (los datos de Postgres se conservan)...
 docker compose down
-echo.
-echo Contenedores detenidos correctamente.
+echo Listo.
 pause

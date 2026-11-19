@@ -10,6 +10,7 @@ from app.services.image_loader import ImagenInvalidaError, cargar_bytes_imagen, 
 from app.services.gemini_client import GeminiAuthError, GeminiError
 from app.services.groq_client import GroqError
 from app.services.vision_ai import analizar_imagen, comparar_biometria_forense
+from app.services.vision_gate import FotoNoAptoError
 
 router = APIRouter()
 
@@ -85,6 +86,8 @@ async def analizar_mascota(request: Request):
 
     try:
         return {"success": True, "analisis": analizar_imagen(image_bytes, mime_type)}
+    except FotoNoAptoError as e:
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(e)) from e
     except (GeminiAuthError, GroqError) as e:
         raise HTTPException(status_code=status.HTTP_503_SERVICE_UNAVAILABLE, detail=str(e))
     except GeminiError as e:

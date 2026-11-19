@@ -49,7 +49,7 @@ export async function analizarFoto(fotoUri: string): Promise<AnalisisIA> {
     return await pedirAnalisis(armarFormDataFoto(fotoUrl));
   } catch (err) {
     const status = err instanceof ApiRequestError ? err.status : 0;
-    if (status !== 400 && status !== 413 && status !== 415 && status !== 422) throw err;
+    if (status !== 400 && status !== 413 && status !== 415) throw err;
     return pedirAnalisis({ fotoUrl });
   }
 }

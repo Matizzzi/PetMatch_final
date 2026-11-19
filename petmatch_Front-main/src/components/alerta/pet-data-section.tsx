@@ -30,7 +30,7 @@ export function PetDataSection({ values, setField, fotoIA }: PetDataSectionProps
         state={fotoIA}
         label="Foto de la mascota (muy recomendado)"
         placeholderTitle="Subir o tomar una foto"
-        placeholderHint="Ayudará mucho a que la comunidad la reconozca"
+        placeholderHint="Foto real de un solo perro o gato, de frente o de lado"
       />
 
       <FormField

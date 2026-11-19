@@ -18,7 +18,7 @@ export function AnimalSection({ values, setField, fotoIA }: AnimalSectionProps) 
         state={fotoIA}
         label="Foto del animal avistado"
         placeholderTitle="Subir foto del animal"
-        placeholderHint="Toma o sube una foto clara para que el dueño lo reconozca"
+        placeholderHint="Foto real de un solo animal, lo más cerca y nítida posible"
       />
 
       <SpeciesSelector

@@ -1,10 +1,12 @@
 from typing import Optional
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, Request, UploadFile, status
 from sqlalchemy.orm import Session
 
 from app.api.forms import alerta_create_form
 from app.core.database import get_db
+from app.core.foto_segura import FotoInvalidaError
+from app.core.rate_limit import limitar_cierre, limitar_publicar
 from app.schemas.alerta import (
     AlertaCreateForm,
     AlertaCreateResponse,
@@ -36,9 +38,11 @@ def get_alerta(alerta_id: str, db: Session = Depends(get_db)):
 def marcar_alerta_resuelta(
     alerta_id: str,
     body: AlertaResolverBody,
+    request: Request,
     db: Session = Depends(get_db),
 ):
     """Cierra la alerta con el código entregado al publicar. No requiere cuenta."""
+    limitar_cierre(request)
     alerta = alertas_service.obtener_alerta(db, alerta_id)
     if not alerta:
         raise HTTPException(status_code=404, detail="Alerta no encontrada")
@@ -67,10 +71,15 @@ def marcar_alerta_resuelta(
 
 @router.post("", response_model=AlertaCreateResponse, status_code=status.HTTP_201_CREATED)
 async def create_alerta(
+    request: Request,
     datos: AlertaCreateForm = Depends(alerta_create_form),
     foto: Optional[UploadFile] = File(None),
     db: Session = Depends(get_db),
 ):
     """Crea una alerta comunitaria. El código de cierre se entrega solo en esta respuesta."""
-    alerta, codigo_cierre = alertas_service.crear_alerta(db, datos, foto)
+    limitar_publicar(request)
+    try:
+        alerta, codigo_cierre = alertas_service.crear_alerta(db, datos, foto)
+    except FotoInvalidaError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)) from e
     return {"success": True, "alerta": alerta, "codigoCierre": codigo_cierre}

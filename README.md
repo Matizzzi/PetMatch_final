@@ -1,35 +1,29 @@
 # PetMatch
 
-Plataforma comunitaria para mascotas perdidas (Melipilla). Sin registro: se publica anónimo y se cierra con un código de 8 caracteres.
+Plataforma comunitaria para mascotas perdidas. **Sin registro**: se publica anónimo y se cierra con un código de 8 caracteres.
 
-```
-petmatch_Front-main/     App Expo (web + Android)
-petmatch_Backend-main/   API FastAPI
-pgadmin/                 Solo para Docker (opcional)
-```
+**Si vas a evaluarlo o instalarlo: leé [`MANUAL_TECNICO.md`](MANUAL_TECNICO.md).** Ahí está el paso a paso para cualquier PC (Windows, macOS, Linux), puertos, prueba mínima y qué hacer si algo falla.
 
-## Arrancar
+## Arranque rápido
 
-Copia `.env.example` a `.env` y poné `DATABASE_URL` (y `GROQ_API_KEY` si usás IA). Nunca subas el `.env`.
-
-Windows: doble clic en `iniciar.bat`. Para parar: `detener.bat`.
-
-O en terminal:
-
-```bash
-docker compose up -d --build
-```
+1. Instalá [Docker Desktop](https://www.docker.com/products/docker-desktop/) y dejaló abierto.
+2. Cloná este repo.
+3. Windows: doble clic en `iniciar.bat`.  
+   macOS/Linux: `chmod +x iniciar.sh && ./iniciar.sh`
 
 | Qué | URL |
 |---|---|
 | App | http://localhost:3000 |
 | API | http://localhost:8000 |
 | Docs | http://localhost:8000/docs |
-| pgAdmin | http://localhost:5050 (admin@petmatch.com / admin) |
+| pgAdmin | http://localhost:5050 (`admin@petmatch.com` / `admin`) |
 
-## Qué hace
+La primera vez tarda varios minutos (build). Postgres corre en Docker; no hace falta cuenta Neon para la demo local. `GROQ_API_KEY` es opcional.
 
-- Publicar pérdida o avistamiento con foto
-- Matching por especie, zona, tiempo y rasgos
-- Peritaje de fotos (Groq → Gemini → local)
-- Afiche para WhatsApp
+Nunca subas el archivo `.env`.
+
+```
+petmatch_Front-main/     Expo (web + Android + iOS / Expo Go)
+petmatch_Backend-main/   FastAPI
+pgadmin/                 Servidores de pgAdmin
+```

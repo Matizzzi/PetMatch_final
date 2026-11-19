@@ -9,8 +9,17 @@ from typing import Optional
 PROMPT_ANALISIS = (
     "Eres un asistente veterinario experto en rescate de animales y visión computacional para la app PetMatch. "
     "Tu objetivo es analizar la foto del animal y extraer su morfología con alta precisión para una base de datos comunitaria. "
+    "PRIMERO clasificá si la imagen sirve. PetMatch SOLO acepta FOTOGRAFÍAS REALES de perros o gatos vivos. "
+    "Rechazá (esFotoValida=false) si ves: personas o selfies; dibujos, caricaturas, anime, stickers, memes, logos, "
+    "capturas de pantalla o imágenes generadas por IA; objetos, comida o paisajes sin mascota; "
+    "otros animales que no sean perro o gato; foto negra, tapada o ilegible. "
+    "Si hay DOS O MÁS perros/gatos: esFotoValida=true, cantidadAnimales=N, y analizá SOLO el animal principal "
+    "(el más grande o más centrado). No promedies pelajes de dos animales distintos.\n"
     "Responde EXCLUSIVAMENTE un objeto JSON válido (sin formato markdown, sin bloques de código ```json) con los siguientes campos:\n"
     "{\n"
+    '  "esFotoValida": true o false,\n'
+    '  "motivoRechazo": null o "persona" o "dibujo" o "meme" o "objeto" o "otro_animal" o "ilegible",\n'
+    '  "cantidadAnimales": 1,\n'
     '  "especie": "perro" o "gato" o "otro",\n'
     '  "razaEstimada": "nombre de la raza probable o mestizo/cruzado",\n'
     '  "colorPelaje": "colores y patrón del pelaje (ej. Blanco liso, Atigrado marrón, Negro con pecho blanco)",\n'

@@ -3,6 +3,7 @@ import { Alert } from "react-native";
 
 import { mensajeDeError } from "@/lib/errors";
 import { analizarFoto } from "@/services/ia";
+import { ApiRequestError } from "@/services/api";
 import type { AnalisisIA } from "@/types/ai";
 
 /**
@@ -25,7 +26,13 @@ export function useAiTriage() {
     } catch (err) {
       const mensaje = mensajeDeError(err, "No se pudo analizar la imagen. Intenta de nuevo.");
       setError(mensaje);
-      Alert.alert("Error de IA", mensaje);
+      const titulo =
+        err instanceof ApiRequestError && (err.status === 422 || err.status === 429)
+          ? err.status === 429
+            ? "Límite de IA"
+            : "Foto no apta"
+          : "Error de IA";
+      Alert.alert(titulo, mensaje);
       return null;
     } finally {
       setAnalizando(false);

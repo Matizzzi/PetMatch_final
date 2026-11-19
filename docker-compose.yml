@@ -21,6 +21,9 @@ services:
     volumes:
       - ./petmatch_Backend-main/uploads:/app/uploads
       - ./petmatch_Backend-main/app:/app/app
+    depends_on:
+      postgres:
+        condition: service_healthy
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/')"]
       interval: 10s
@@ -61,16 +64,10 @@ services:
     volumes:
       - ./pgadmin/servers.json:/pgadmin4/servers.json:ro
 
-  # ==========================================
-  # BASE DE DATOS LOCAL OPCIONAL (OFFLINE)
-  # Solo se inicia si ejecutas: docker compose --profile local-db up
-  # Por defecto el proyecto usa Neon DB en la nube.
-  # ==========================================
+  # Postgres local: con .env.example el proyecto arranca sin cuenta Neon.
   postgres:
     image: postgres:15-alpine
     container_name: petmatch_postgres
-    profiles:
-      - local-db
     restart: unless-stopped
     environment:
       POSTGRES_USER: petmatch_user
@@ -80,6 +77,12 @@ services:
       - "5432:5432"
     volumes:
       - petmatch_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U petmatch_user -d petmatch"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
 
 volumes:
   petmatch_pgdata:
